@@ -1,7 +1,5 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.client.ClientConnection;
-
 import java.io.IOException;
 
 public class YaimaCliClientApp {
@@ -15,6 +13,7 @@ public class YaimaCliClientApp {
         thread.start();
 
         CLI cli = new CLI(clientConnection);
+        clientConnection.setCLI(cli);
         cli.doIt();
 
         System.out.println("cli exited");

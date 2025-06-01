@@ -1,6 +1,6 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.client.ClientConnection;
+import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
@@ -9,11 +9,12 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import java.io.IOException;
 
 public class CLI {
-//    private  TextGUIThreadFactory textGUIThreadFactory;
     private final ClientConnection clientConnection;
+    private WindowBasedTextGUI textGUI;
+    private Panel friendPanel;
 
     public CLI(ClientConnection clientConnection) {
-//        textGUIThreadFactory = new SeparateTextGUIThread.Factory();
+
         this.clientConnection = clientConnection;
     }
 
@@ -24,13 +25,16 @@ public class CLI {
         screen.startScreen();
 
 
-        final WindowBasedTextGUI textGUI = new MultiWindowTextGUI(/*textGUIThreadFactory,*/
-                screen);
+        textGUI = new MultiWindowTextGUI(screen);
 
         textGUI.addWindowAndWait(getLoginWindow());
         textGUI.addWindowAndWait(getMainWindow());
 
         screen.stopScreen();
+    }
+
+    public WindowBasedTextGUI getGUI() {
+        return textGUI;
     }
 
     private Window getMainWindow() {
@@ -45,11 +49,21 @@ public class CLI {
         Label chatWithLabel = new Label("Chat With Dummy");
         contentPanel.addComponent(chatWithLabel);
 
+        friendPanel = new Panel(new GridLayout(1));
         Label friendLabel = new Label("Friends");
-        contentPanel.addComponent(friendLabel);
+        friendPanel.addComponent(friendLabel);
+        Button friendButton = new Button("dummy-friend");
+        friendPanel.addComponent(friendButton);
+        contentPanel.addComponent(friendPanel);
+
+
+
 
         TextBox chatTextBox = new TextBox("select a friend from 'Friends' and start chatting");
         contentPanel.addComponent(chatTextBox);
+
+
+
 
         window.setComponent(contentPanel);
 
@@ -111,5 +125,14 @@ public class CLI {
         window.setComponent(contentPanel);
 
         return window;
+    }
+
+    public void updateWithFriend(Friend f) {
+        friendPanel.removeAllComponents();
+
+        Label friendLabel = new Label("Friends");
+        friendPanel.addComponent(friendLabel);
+        Button friendButton = new Button(f.username);
+        friendPanel.addComponent(friendButton);
     }
 }

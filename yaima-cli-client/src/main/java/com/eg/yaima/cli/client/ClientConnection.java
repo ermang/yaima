@@ -1,12 +1,13 @@
-package com.eg.yaima.client;
+package com.eg.yaima.cli.client;
 
 import com.eg.yaima.Constant;
+import com.eg.yaima.UserStatus;
+import com.eg.yaima.client.Friend;
 
 import java.io.IOException;
 
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Scanner;
 
 public class ClientConnection implements Runnable{
 
@@ -14,6 +15,7 @@ public class ClientConnection implements Runnable{
     private String ip;
     private int port;
     private Socket socket;
+    private CLI cli;
 
     public ClientConnection(String ip, int port) {
         this.ip = ip;
@@ -78,6 +80,11 @@ public class ClientConnection implements Runnable{
                     String status = new String(tempArr, 3, 3, Constant.CHARSET);
                     String friend = new String(tempArr, 6, tempArr.length - 6, Constant.CHARSET);
                     System.out.println(friend);
+
+                    cli.getGUI().getGUIThread().invokeLater(() -> {
+                        Friend f = new Friend(friend, UserStatus.ONLINE);
+                        cli.updateWithFriend(f);
+                    });
                 }
             }
 
@@ -99,5 +106,9 @@ public class ClientConnection implements Runnable{
         }
 
         return true;
+    }
+
+    public void setCLI(CLI cli) {
+        this.cli = cli;
     }
 }
