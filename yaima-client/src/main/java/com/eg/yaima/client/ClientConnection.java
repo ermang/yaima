@@ -87,15 +87,16 @@ public class ClientConnection implements Runnable{
 
     }
 
-    private boolean login() throws IOException {
-        System.out.println("username:");
-        Scanner scanner = new Scanner(System.in);
-        String username = scanner.nextLine();
+    public boolean login(String username) {
 
         String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
 
         byte[] tempArr = usernameSpacePadded.getBytes(Constant.CHARSET);
-        socket.getOutputStream().write(tempArr);
+        try {
+            socket.getOutputStream().write(tempArr);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return true;
     }
