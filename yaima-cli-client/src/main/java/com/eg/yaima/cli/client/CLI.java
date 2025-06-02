@@ -62,10 +62,10 @@ public class CLI {
                 """, TextBox.Style.MULTI_LINE);
         chatTextBox.setReadOnly(true);
         chatTextBox.setLayoutData(GridLayout.createLayoutData(
-                GridLayout.Alignment.BEGINNING, // Horizontal alignment in the grid cell if the cell is larger than the component's preferred size
-                GridLayout.Alignment.BEGINNING, // Vertical alignment in the grid cell if the cell is larger than the component's preferred size
+                GridLayout.Alignment.FILL, // Horizontal alignment in the grid cell if the cell is larger than the component's preferred size
+                GridLayout.Alignment.FILL, // Vertical alignment in the grid cell if the cell is larger than the component's preferred size
                 true,       // Give the component extra horizontal space if available
-                false,        // Give the component extra vertical space if available
+                true,        // Give the component extra vertical space if available
                 1,                  // Horizontal span
                 1));                  // Vertical
         contentPanel.addComponent(chatTextBox);
@@ -162,8 +162,10 @@ public class CLI {
                             System.out.println("enter pressed");
                             SendMessageCommand smc = new SendMessageCommand("dummy", friendButton.getLabel(), sendTextBox.getText());
 
-                            chatTextBox.setText(chatTextBox.getText() + "\nyou: " + sendTextBox.getText() + "\n");
+                            chatTextBox.addLine("you: " + sendTextBox.getText());
+
                             sendTextBox.setText("");
+
                             clientConnection.sendMessage(smc);
                             return false;
                         }

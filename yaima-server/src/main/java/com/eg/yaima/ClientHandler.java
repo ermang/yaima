@@ -17,8 +17,8 @@ public class ClientHandler implements Runnable{
         String remoteIp = socket.getInetAddress().getHostAddress();
         int remotePort = socket.getPort();
 
-
         byte[] tempArr = null;
+
         try {
             tempArr = socket.getInputStream().readNBytes(Constant.MAX_USERNAME_LEN);
 
