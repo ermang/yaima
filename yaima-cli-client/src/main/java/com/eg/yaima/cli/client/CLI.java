@@ -1,7 +1,9 @@
 package com.eg.yaima.cli.client;
 
+import com.eg.yaima.UserStatus;
 import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -12,6 +14,7 @@ public class CLI {
     private final ClientConnection clientConnection;
     private WindowBasedTextGUI textGUI;
     private Panel friendPanel;
+    private Panel friendListPanel;
 
     public CLI(ClientConnection clientConnection) {
 
@@ -52,14 +55,22 @@ public class CLI {
         friendPanel = new Panel(new GridLayout(1));
         Label friendLabel = new Label("Friends");
         friendPanel.addComponent(friendLabel);
+        
+        friendListPanel = new Panel(new GridLayout(2));
+
+        Label statusLabel = new Label(" ");
+        statusLabel.setBackgroundColor(TextColor.ANSI.WHITE);
+        statusLabel.setForegroundColor(TextColor.ANSI.WHITE);
+        friendListPanel.addComponent(statusLabel);
+
         Button friendButton = new Button("dummy-friend");
-        friendPanel.addComponent(friendButton);
+        friendListPanel.addComponent(friendButton);
+
+        friendPanel.addComponent(friendListPanel);
         contentPanel.addComponent(friendPanel);
 
-
-
-
         TextBox chatTextBox = new TextBox("select a friend from 'Friends' and start chatting");
+
         contentPanel.addComponent(chatTextBox);
 
 
@@ -79,12 +90,6 @@ public class CLI {
         gridLayout.setHorizontalSpacing(3);
         gridLayout.setVerticalSpacing(1);
 
-            /*
-            One of the most basic components is the Label, which simply displays a static text. In the example below,
-            we use the layout data field attached to each component to give the layout manager extra hints about how it
-            should be placed. Obviously the layout data has to be created from the same layout manager as the container
-            is using, otherwise it will be ignored.
-             */
         Label usernameLabel = new Label("username:");
         usernameLabel.setLayoutData(GridLayout.createLayoutData(
                 GridLayout.Alignment.BEGINNING, // Horizontal alignment in the grid cell if the cell is larger than the component's preferred size
@@ -99,7 +104,6 @@ public class CLI {
 
         usernameTextBox.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.BEGINNING, GridLayout.Alignment.CENTER));
         contentPanel.addComponent(usernameTextBox);
-
 
         contentPanel.addComponent(new Label("password:"));
         contentPanel.addComponent(
@@ -127,12 +131,17 @@ public class CLI {
         return window;
     }
 
-    public void updateWithFriend(Friend f) {
-        friendPanel.removeAllComponents();
+    public void updateFriendListPanel(Friend f) {
+        friendListPanel.removeAllComponents();
 
-        Label friendLabel = new Label("Friends");
-        friendPanel.addComponent(friendLabel);
-        Button friendButton = new Button(f.username);
-        friendPanel.addComponent(friendButton);
+        Label statusLabel = new Label(" ");
+        statusLabel.setBackgroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+        statusLabel.setForegroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+        friendListPanel.addComponent(statusLabel);
+
+        Button friendButton = new Button(f.username, () -> {
+            System.out.println("selected friend" + f.username);
+        });
+        friendListPanel.addComponent(friendButton);
     }
 }

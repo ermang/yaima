@@ -83,7 +83,7 @@ public class ClientConnection implements Runnable{
 
                     cli.getGUI().getGUIThread().invokeLater(() -> {
                         Friend f = new Friend(friend, UserStatus.ONLINE);
-                        cli.updateWithFriend(f);
+                        cli.updateFriendListPanel(f);
                     });
                 }
             }
