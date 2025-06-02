@@ -1,10 +1,13 @@
 package com.eg.yaima.cli.client;
 
+import com.eg.yaima.SendMessageCommand;
 import com.eg.yaima.UserStatus;
 import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
@@ -15,6 +18,8 @@ public class CLI {
     private WindowBasedTextGUI textGUI;
     private Panel friendPanel;
     private Panel friendListPanel;
+    private TextBox chatTextBox;
+    private TextBox sendTextBox;
 
     public CLI(ClientConnection clientConnection) {
 
@@ -49,13 +54,19 @@ public class CLI {
         gridLayout.setHorizontalSpacing(3);
         gridLayout.setVerticalSpacing(1);
 
-        Label chatWithLabel = new Label("Chat With Dummy");
-        contentPanel.addComponent(chatWithLabel);
+        chatTextBox = new TextBox("""
+                you: hi
+                dummy: hi
+                you: bye
+                dummy: bye
+                """, TextBox.Style.MULTI_LINE);
+        chatTextBox.setReadOnly(true);
+        contentPanel.addComponent(chatTextBox);
 
         friendPanel = new Panel(new GridLayout(1));
         Label friendLabel = new Label("Friends");
         friendPanel.addComponent(friendLabel);
-        
+
         friendListPanel = new Panel(new GridLayout(2));
 
         Label statusLabel = new Label(" ");
@@ -69,12 +80,8 @@ public class CLI {
         friendPanel.addComponent(friendListPanel);
         contentPanel.addComponent(friendPanel);
 
-        TextBox chatTextBox = new TextBox("select a friend from 'Friends' and start chatting");
-
-        contentPanel.addComponent(chatTextBox);
-
-
-
+        sendTextBox = new TextBox("select a friend from 'Friends' and start chatting");
+        contentPanel.addComponent(sendTextBox);
 
         window.setComponent(contentPanel);
 
@@ -139,9 +146,30 @@ public class CLI {
         statusLabel.setForegroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
         friendListPanel.addComponent(statusLabel);
 
-        Button friendButton = new Button(f.username, () -> {
-            System.out.println("selected friend" + f.username);
-        });
+        Button friendButton = new Button(f.username);
+        friendButton.addListener(button -> {
+                    System.out.println("selected friend " + f.username);
+
+                    sendTextBox.setInputFilter((interactable, key) -> {
+                        if (key.getKeyType() == KeyType.Enter) {
+                            System.out.println("enter pressed");
+                            SendMessageCommand smc = new SendMessageCommand("dummy", friendButton.getLabel(), sendTextBox.getText());
+                            sendTextBox.setText("");
+                            chatTextBox.setText(chatTextBox.getText() + "\nyou: " + sendTextBox.getText() + "\n");
+                            clientConnection.sendMessage(smc);
+                            return false;
+                        }
+                        return true;
+                    });
+                }
+            );
+
+
         friendListPanel.addComponent(friendButton);
     }
 }
+
+//
+//// Move caret to end to auto-scroll
+//int lastLine = logBox.getLineCount() - 1;
+//                    logBox.setCaretPosition(lastLine, 0);

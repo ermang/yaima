@@ -64,7 +64,9 @@ header => 3 bytes String, lets you know the type of body.
 body => there are multiple types of body,  
 serialization/deserialization logic should be extracted from header  
 
-"STT"  => status update
+# Packet Types  
+
+"STT"  => Status Packet
 
 3 | V
 
@@ -74,7 +76,15 @@ variable length byte String => length of username
 
 ---  
 
-asd
+"SMS" => Send Message Packet
+
+V | V | V
+
+from  
+to  
+message  
+
+these 3 string fields are converted to byteArray, and joined via seperator with ASCII code 0, not the number 0 or the string 0 but its byte representation, receiver should split based on that and extract fields
 
 
 
