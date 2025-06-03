@@ -86,6 +86,29 @@ public class ClientConnection implements Runnable{
                         Friend f = new Friend(friend, UserStatus.ONLINE);
                         cli.updateFriendListPanel(f);
                     });
+                } else                 if (packetType.equals("SMS")) {
+                    int fromIndex = -1;
+                    int toIndex = -1;
+
+                    for (int i = 0; i < tempArr.length; i++) {
+                        if (tempArr[i] == 0) {
+                            fromIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = fromIndex+1; i < tempArr.length; i++) {
+                        if (tempArr[i] == 0) {
+                            toIndex = i;
+                            break;
+                        }
+                    }
+
+                    String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
+                    String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
+                    String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
+
+                    cli.updateChat(new SendMessageCommand(from, to, msg));
                 }
             }
 

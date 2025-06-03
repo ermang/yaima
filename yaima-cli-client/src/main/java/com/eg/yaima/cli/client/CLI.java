@@ -177,6 +177,10 @@ public class CLI {
 
         friendListPanel.addComponent(friendButton);
     }
+
+    public void updateChat(SendMessageCommand sendMessageCommand) {
+        chatTextBox.addLine(sendMessageCommand.from + ": " + sendMessageCommand.message);
+    }
 }
 
 //

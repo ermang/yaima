@@ -7,9 +7,12 @@ import java.nio.ByteBuffer;
 public class ClientHandler implements Runnable{
 
     private final Socket socket;
+    private final YaimaServer yaimaServer;
+    private String username;
 
-    public ClientHandler(Socket socket) {
+    public ClientHandler(Socket socket, YaimaServer yaimaServer) {
         this.socket = socket;
+        this.yaimaServer = yaimaServer;
     }
 
     @Override
@@ -25,6 +28,9 @@ public class ClientHandler implements Runnable{
 
             String username = new String(tempArr, Constant.CHARSET).trim();
             System.out.println(username);
+
+            yaimaServer.addOnlineUser(username, this);
+            this.username = username;
 
             //TODO: do the login
             //assume login is successful
@@ -51,6 +57,80 @@ public class ClientHandler implements Runnable{
                 throw new RuntimeException(e);
         }
 
+        //start listening from client
+        while(true) {
+            try {
+                byte[] msgLenArr = socket.getInputStream().readNBytes(2);
+
+
+                int msgLen = ByteBuffer.wrap(msgLenArr).getShort();
+
+                tempArr = socket.getInputStream().readNBytes(msgLen);
+
+                String packetType = new String(tempArr, 0, 3, Constant.CHARSET);
+
+                if (packetType.equals("SMS")) {
+                    int fromIndex = -1;
+                    int toIndex = -1;
+
+                    for (int i = 0; i < tempArr.length; i++) {
+                        if (tempArr[i] == 0) {
+                            fromIndex = i;
+                            break;
+                        }
+                    }
+
+                    for (int i = fromIndex+1; i < tempArr.length; i++) {
+                        if (tempArr[i] == 0) {
+                            toIndex = i;
+                            break;
+                        }
+                    }
+
+                    String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
+                    String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
+                    String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
+
+                    yaimaServer.redirectChat(new SendMessageCommand(from, to, msg));
+                }
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
+    public void sendMessage(SendMessageCommand smc) {
+        byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
+        byte[] fromArr = smc.from.getBytes(Constant.CHARSET);
+        byte[] toArr = smc.to.getBytes(Constant.CHARSET);
+        byte[] messageArr = smc.message.getBytes(Constant.CHARSET);
+
+        byte[] concatenatedArr = new byte[packetTypeArr.length + fromArr.length + 1 + toArr.length + 1 + messageArr.length];
+
+        int index = 0;
+
+        System.arraycopy(packetTypeArr, 0, concatenatedArr, 0, packetTypeArr.length);
+        index = index + packetTypeArr.length;
+        System.arraycopy(fromArr, 0, concatenatedArr, index, fromArr.length);
+        index = index + fromArr.length;
+        concatenatedArr[index] = 0x0;
+        index = index + 1;
+        System.arraycopy(toArr, 0, concatenatedArr, index, toArr.length);
+        index = index + toArr.length;
+        concatenatedArr[index] = 0x0;
+        index = index + 1;
+        System.arraycopy(messageArr, 0, concatenatedArr, index, messageArr.length);
+
+        short x = (short) concatenatedArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(concatenatedArr);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
