@@ -86,5 +86,14 @@ message
 
 these 3 string fields are converted to byteArray, and joined via seperator with ASCII code 0, not the number 0 or the string 0 but its byte representation, receiver should split based on that and extract fields
 
+# TODO / QUIRKS
+
+TextBox scroll to end doesnt work when readonly is set to true  
+
+https://stackoverflow.com/questions/72553607/lanterna-how-to-make-a-textbox-scroll-to-the-bottom-upon-adding-more-text  
+
+added an input filter to only accept navigational key presses, and ignore the rest  
+hack solution but works  
+
 
 

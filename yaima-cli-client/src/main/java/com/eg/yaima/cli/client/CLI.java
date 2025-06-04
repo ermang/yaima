@@ -6,7 +6,6 @@ import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
-import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
@@ -79,7 +78,7 @@ public class CLI {
                 you: bye
                 dummy: bye
                 """, TextBox.Style.MULTI_LINE);
-        chatTextBox.setReadOnly(true);
+
         chatTextBox.setLayoutData(GridLayout.createLayoutData(
                 GridLayout.Alignment.FILL, // Horizontal alignment in the grid cell if the cell is larger than the component's preferred size
                 GridLayout.Alignment.FILL, // Vertical alignment in the grid cell if the cell is larger than the component's preferred size
@@ -186,6 +185,23 @@ public class CLI {
                     sendTextBox.setText("");
                     activeChatLabel.setText("Active Chat: " + f.username);
 
+                    chatTextBox.setInputFilter((interactable, keyStroke) -> {
+                        switch (keyStroke.getKeyType()) {
+                            case Tab:
+                            case ReverseTab:
+                            case ArrowUp:
+                            case ArrowDown:
+                            case ArrowLeft:
+                            case ArrowRight:
+                            case PageUp:
+                            case PageDown:
+                                return true; // Allow navigation
+                            default:
+                                return false; // Block everything else (e.g., typing, Enter, Backspace)
+                        }
+                    });
+
+
                     sendTextBox.setInputFilter((interactable, key) -> {
                         if (key.getKeyType() == KeyType.Enter) {
                             System.out.println("enter pressed");
@@ -193,7 +209,11 @@ public class CLI {
 
                             chatTextBox.addLine("you: " + sendTextBox.getText());
 
+                            chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+
                             sendTextBox.setText("");
+
 
                             clientConnection.sendMessage(smc);
                             return false;
@@ -201,7 +221,7 @@ public class CLI {
                         return true;
                     });
                 }
-            );
+        );
 
 
         friendListPanel.addComponent(friendButton);
@@ -209,10 +229,6 @@ public class CLI {
 
     public void updateChat(SendMessageCommand sendMessageCommand) {
         chatTextBox.addLine(sendMessageCommand.from + ": " + sendMessageCommand.message);
+        chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 }
-
-//
-//// Move caret to end to auto-scroll
-//int lastLine = logBox.getLineCount() - 1;
-//                    logBox.setCaretPosition(lastLine, 0);
