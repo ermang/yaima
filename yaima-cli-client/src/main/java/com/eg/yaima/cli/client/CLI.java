@@ -20,6 +20,8 @@ public class CLI {
     private Panel friendListPanel;
     private TextBox chatTextBox;
     private TextBox sendTextBox;
+    private Window window;
+    private Label activeChatLabel;
 
     public CLI(ClientConnection clientConnection) {
 
@@ -35,8 +37,10 @@ public class CLI {
 
         textGUI = new MultiWindowTextGUI(screen);
 
-        textGUI.addWindowAndWait(getLoginWindow());
-        textGUI.addWindowAndWait(getMainWindow());
+        window = getLoginWindow();
+        textGUI.addWindowAndWait(window);
+        window = getMainWindow();
+        textGUI.addWindowAndWait(window);
 
         screen.stopScreen();
     }
@@ -48,11 +52,26 @@ public class CLI {
     private Window getMainWindow() {
         Window window = new BasicWindow("YAIMA");
 
-        Panel contentPanel = new Panel(new GridLayout(2));
+        Panel parentPanel = new Panel(new GridLayout(2));
 
-        GridLayout gridLayout = (GridLayout)contentPanel.getLayoutManager();
+        GridLayout gridLayout = (GridLayout)parentPanel.getLayoutManager();
         gridLayout.setHorizontalSpacing(3);
         gridLayout.setVerticalSpacing(1);
+
+        Panel chatPanel = new Panel(new GridLayout(1));
+
+        GridLayout chatPanelLayout = (GridLayout)chatPanel.getLayoutManager();
+        chatPanelLayout.setHorizontalSpacing(3);
+        chatPanelLayout.setVerticalSpacing(1);
+
+        activeChatLabel = new Label("Active Chat: ");
+        activeChatLabel.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, // Horizontal alignment in the grid cell if the cell is larger than the component's preferred size
+                GridLayout.Alignment.FILL, // Vertical alignment in the grid cell if the cell is larger than the component's preferred size
+                true,       // Give the component extra horizontal space if available
+                true,        // Give the component extra vertical space if available
+                1,                  // Horizontal span
+                1));
+        chatPanel.addComponent(activeChatLabel);
 
         chatTextBox = new TextBox("""
                 you: hi
@@ -66,9 +85,15 @@ public class CLI {
                 GridLayout.Alignment.FILL, // Vertical alignment in the grid cell if the cell is larger than the component's preferred size
                 true,       // Give the component extra horizontal space if available
                 true,        // Give the component extra vertical space if available
-                1,                  // Horizontal span
+                2,                  // Horizontal span
                 1));                  // Vertical
-        contentPanel.addComponent(chatTextBox);
+        chatPanel.addComponent(chatTextBox);
+
+
+
+        sendTextBox = new TextBox("select a friend from 'Friends' and start chatting");
+
+        chatPanel.addComponent(sendTextBox);
 
         friendPanel = new Panel(new GridLayout(1));
         Label friendLabel = new Label("Friends");
@@ -85,12 +110,12 @@ public class CLI {
         friendListPanel.addComponent(friendButton);
 
         friendPanel.addComponent(friendListPanel);
-        contentPanel.addComponent(friendPanel);
 
-        sendTextBox = new TextBox("select a friend from 'Friends' and start chatting");
-        contentPanel.addComponent(sendTextBox);
+        parentPanel.addComponent(chatPanel);
+        parentPanel.addComponent(friendPanel);
 
-        window.setComponent(contentPanel);
+
+        window.setComponent(parentPanel);
 
         return window;
     }
@@ -157,10 +182,14 @@ public class CLI {
         friendButton.addListener(button -> {
                     System.out.println("selected friend " + f.username);
 
+                    chatTextBox.setText("");
+                    sendTextBox.setText("");
+                    activeChatLabel.setText("Active Chat: " + f.username);
+
                     sendTextBox.setInputFilter((interactable, key) -> {
                         if (key.getKeyType() == KeyType.Enter) {
                             System.out.println("enter pressed");
-                            SendMessageCommand smc = new SendMessageCommand("dummy", friendButton.getLabel(), sendTextBox.getText());
+                            SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
 
                             chatTextBox.addLine("you: " + sendTextBox.getText());
 
