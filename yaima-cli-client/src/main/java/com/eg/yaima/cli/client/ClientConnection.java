@@ -53,7 +53,7 @@ public class ClientConnection implements Runnable{
                         Friend f = new Friend(friend, UserStatus.ONLINE);
                         cli.updateFriendListPanel(f);
                     });
-                } else                 if (packetType.equals("SMS")) {
+                } else if (packetType.equals("SMS")) {
                     int fromIndex = -1;
                     int toIndex = -1;
 
@@ -75,7 +75,10 @@ public class ClientConnection implements Runnable{
                     String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
                     String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
 
-                    cli.updateChat(new SendMessageCommand(from, to, msg));
+                    cli.getGUI().getGUIThread().invokeLater(() -> {
+                        cli.updateChat(new SendMessageCommand(from, to, msg));
+                    });
+
                 }
             }
 
