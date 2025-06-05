@@ -11,6 +11,10 @@ import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CLI {
     private final ClientConnection clientConnection;
@@ -21,10 +25,13 @@ public class CLI {
     private TextBox sendTextBox;
     private Window window;
     private Label activeChatLabel;
+    private String activeChat;
+    private final Map<String, List<String>> friendChatHistory;
 
     public CLI(ClientConnection clientConnection) {
 
         this.clientConnection = clientConnection;
+        friendChatHistory = new HashMap<>();
     }
 
     public void doIt() throws IOException {
@@ -170,7 +177,7 @@ public class CLI {
     }
 
     public void updateFriendListPanel(Friend f) {
-        friendListPanel.removeAllComponents();
+        //friendListPanel.removeAllComponents();
 
         Label statusLabel = new Label(" ");
         statusLabel.setBackgroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
@@ -180,12 +187,15 @@ public class CLI {
         Button friendButton = new Button(f.username);
         friendButton.addListener(button -> {
                     System.out.println("selected friend " + f.username);
+                    activeChat = f.username;
+                    reloadChatFromHistory();
 
-                    chatTextBox.setText("");
                     sendTextBox.setText("");
+                    sendTextBox.takeFocus();
+
                     activeChatLabel.setText("Active Chat: " + f.username);
 
-                    chatTextBox.setInputFilter((interactable, keyStroke) -> {
+                    chatTextBox.setInputFilter((interactable, keyStroke) -> { //TODO: this should always be active not related to friend button interaction
                         switch (keyStroke.getKeyType()) {
                             case Tab:
                             case ReverseTab:
@@ -208,12 +218,11 @@ public class CLI {
                             SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
 
                             chatTextBox.addLine("you: " + sendTextBox.getText());
+                            updateFriendChatHistory(activeChat, "you: " + sendTextBox.getText());
 
                             chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
-
                             sendTextBox.setText("");
-
 
                             clientConnection.sendMessage(smc);
                             return false;
@@ -227,8 +236,37 @@ public class CLI {
         friendListPanel.addComponent(friendButton);
     }
 
+    private void reloadChatFromHistory() {
+        List<String> chatHistory = friendChatHistory.get(activeChat);
+
+        if (chatHistory == null)
+            chatTextBox.setText("");
+        else {
+            chatTextBox.setText("");
+            for (String s : chatHistory)
+                chatTextBox.addLine(s);
+
+            chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        }
+    }
+
     public void updateChat(SendMessageCommand sendMessageCommand) {
-        chatTextBox.addLine(sendMessageCommand.from + ": " + sendMessageCommand.message);
-        chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        if (activeChat != null && activeChat.equals(sendMessageCommand.from)) {
+            chatTextBox.addLine(sendMessageCommand.from + ": " + sendMessageCommand.message);
+            chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+        }
+
+        updateFriendChatHistory(sendMessageCommand.from, sendMessageCommand.from + ": " + sendMessageCommand.message);
+    }
+
+    private void updateFriendChatHistory(String from, String message) {
+        List<String> chatHistory = friendChatHistory.get(from);
+
+        if (chatHistory == null) {
+            chatHistory = new ArrayList<>();
+            friendChatHistory.put(from, chatHistory);
+        }
+
+        chatHistory.add(message);
     }
 }

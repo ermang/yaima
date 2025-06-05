@@ -38,20 +38,7 @@ public class ClientHandler implements Runnable{
             //TODO: get friends of logged in user
             //TODO: check their statuses (online/offline) and send this data to logged in user
 
-
-                String temp = "STT" + "ONL";
-
-            if (username.equals("alice"))
-                temp = temp + "bob";
-            else
-                temp = temp + "alice";
-
-            short x = (short) temp.length();
-            byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
-
-            socket.getOutputStream().write(bytes);
-
-            socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
+        sendFriendSTT("");
 
         } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -99,6 +86,43 @@ public class ClientHandler implements Runnable{
             }
         }
 
+    }
+
+    private void sendFriendSTT(String friendsUsername) throws IOException {
+
+        String temp = "STT" + "ONL";
+
+        if (username.equals("alice"))
+            temp = temp + "bob";
+        else if (username.equals("bob"))
+            temp = temp + "alice";
+        else if (username.equals("eve"))
+            temp = temp + "alice";
+
+        short x = (short) temp.length();
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        socket.getOutputStream().write(bytes);
+
+        socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
+
+        //TODO: copy paste for now
+
+         temp = "STT" + "ONL";
+
+        if (username.equals("alice"))
+            temp = temp + "eve";
+        else if (username.equals("bob"))
+            temp = temp + "eve";
+        else if (username.equals("eve"))
+            temp = temp + "bob";
+
+         x = (short) temp.length();
+         bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        socket.getOutputStream().write(bytes);
+
+        socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
     }
 
     public void sendMessage(SendMessageCommand smc) {

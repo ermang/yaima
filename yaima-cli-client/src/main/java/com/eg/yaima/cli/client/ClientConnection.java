@@ -6,12 +6,10 @@ import com.eg.yaima.UserStatus;
 import com.eg.yaima.client.Friend;
 
 import java.io.IOException;
-
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class ClientConnection implements Runnable{
-
 
     private String ip;
     private int port;
@@ -23,7 +21,6 @@ public class ClientConnection implements Runnable{
         this.ip = ip;
         this.port = port;
     }
-
 
     @Override
     public void run() {
