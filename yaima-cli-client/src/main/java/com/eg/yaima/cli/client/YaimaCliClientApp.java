@@ -14,7 +14,9 @@ public class YaimaCliClientApp {
 
         CLI cli = new CLI(clientConnection);
         clientConnection.setCLI(cli);
-        cli.doIt();
+        cli.run();
+
+        cli.stopClientConnection();
 
         System.out.println("cli exited");
 

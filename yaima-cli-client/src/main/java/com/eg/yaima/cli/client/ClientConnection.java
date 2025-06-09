@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-public class ClientConnection implements Runnable{
+public class ClientConnection implements Runnable {
 
     private String ip;
     private int port;
@@ -141,5 +141,13 @@ public class ClientConnection implements Runnable{
 
     public String getUsername() {
         return username;
+    }
+
+    public void stop() {
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
