@@ -47,7 +47,7 @@ public class ClientConnection implements Runnable {
                     System.out.println(friend);
 
                     cli.getGUI().getGUIThread().invokeLater(() -> {
-                        Friend f = new Friend(friend, UserStatus.ONLINE);
+                        Friend f = new Friend(friend, status.equals("ONL") ? UserStatus.ONLINE : UserStatus.OFFLINE);
                         cli.updateFriendListPanel(f);
                     });
                 } else if (packetType.equals("SMS")) {

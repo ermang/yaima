@@ -99,61 +99,79 @@ public class MainWindow {
     }
 
     public void updateFriendListPanel(Friend f) {
-        Label statusLabel = new Label(" ");
-        statusLabel.setBackgroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
-        statusLabel.setForegroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
-        friendListPanel.addComponent(statusLabel);
 
-        Button friendButton = new Button(f.username);
-        friendButton.addListener(button -> {
-                    System.out.println("selected friend " + f.username);
-                    activeChat = f.username;
-                    reloadChatFromHistory();
+        boolean friendExistsInPanel = false;
 
-                    sendTextBox.setText("");
-                    sendTextBox.takeFocus();
+        for (int i = 0; i < friendListPanel.getChildrenList().size(); i++) {
+            Component c = friendListPanel.getChildrenList().get(i);
+            if (c instanceof Button && ((Button) c).getLabel().equals(f.username)) {
+                Button friendButton = (Button) friendListPanel.getChildrenList().get(i);
+                friendButton.setEnabled(f.userStatus == UserStatus.ONLINE);
+                Label statusLabel = (Label) friendListPanel.getChildrenList().get(i - 1);
+                statusLabel.setBackgroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+                statusLabel.setForegroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+                friendExistsInPanel = true;
+                break;
+            }
+        }
 
-                    activeChatLabel.setText("Active Chat: " + f.username);
+        if (!friendExistsInPanel) {
+            Label statusLabel = new Label(" ");
+            statusLabel.setBackgroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+            statusLabel.setForegroundColor(f.userStatus == UserStatus.ONLINE ? TextColor.ANSI.GREEN : TextColor.ANSI.WHITE);
+            friendListPanel.addComponent(statusLabel);
 
-                    chatTextBox.setInputFilter((interactable, keyStroke) -> { //TODO: this should always be active not related to friend button interaction
-                        switch (keyStroke.getKeyType()) {
-                            case Tab:
-                            case ReverseTab:
-                            case ArrowUp:
-                            case ArrowDown:
-                            case ArrowLeft:
-                            case ArrowRight:
-                            case PageUp:
-                            case PageDown:
-                                return true; // Allow navigation
-                            default:
-                                return false; // Block everything else (e.g., typing, Enter, Backspace)
-                        }
-                    });
+            Button friendButton = new Button(f.username);
+            friendButton.addListener(button -> {
+                        System.out.println("selected friend " + f.username);
+                        activeChat = f.username;
+                        reloadChatFromHistory();
 
+                        sendTextBox.setText("");
+                        sendTextBox.takeFocus();
 
-                    sendTextBox.setInputFilter((interactable, key) -> {
-                        if (key.getKeyType() == KeyType.Enter) {
-                            System.out.println("enter pressed");
-                            SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
+                        activeChatLabel.setText("Active Chat: " + f.username);
 
-                            chatTextBox.addLine("you: " + sendTextBox.getText());
-                            updateFriendChatHistory(activeChat, "you: " + sendTextBox.getText());
-
-                            chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
-
-                            sendTextBox.setText("");
-
-                            clientConnection.sendMessage(smc);
-                            return false;
-                        }
-                        return true;
-                    });
-                }
-        );
+                        chatTextBox.setInputFilter((interactable, keyStroke) -> { //TODO: this should always be active not related to friend button interaction
+                            switch (keyStroke.getKeyType()) {
+                                case Tab:
+                                case ReverseTab:
+                                case ArrowUp:
+                                case ArrowDown:
+                                case ArrowLeft:
+                                case ArrowRight:
+                                case PageUp:
+                                case PageDown:
+                                    return true; // Allow navigation
+                                default:
+                                    return false; // Block everything else (e.g., typing, Enter, Backspace)
+                            }
+                        });
 
 
-        friendListPanel.addComponent(friendButton);
+                        sendTextBox.setInputFilter((interactable, key) -> {
+                            if (key.getKeyType() == KeyType.Enter) {
+                                System.out.println("enter pressed");
+                                SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
+
+                                chatTextBox.addLine("you: " + sendTextBox.getText());
+                                updateFriendChatHistory(activeChat, "you: " + sendTextBox.getText());
+
+                                chatTextBox.setCaretPosition(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+                                sendTextBox.setText("");
+
+                                clientConnection.sendMessage(smc);
+                                return false;
+                            }
+                            return true;
+                        });
+                    }
+            );
+
+            friendListPanel.addComponent(friendButton);
+        }
+
     }
 
     private void reloadChatFromHistory() {

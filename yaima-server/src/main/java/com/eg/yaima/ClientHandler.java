@@ -2,9 +2,10 @@ package com.eg.yaima;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
 
     private final Socket socket;
     private final YaimaServer yaimaServer;
@@ -42,6 +43,7 @@ public class ClientHandler implements Runnable{
 
         } catch (IOException e) {
                 throw new RuntimeException(e);
+                //TODO: bunu da handle et
         }
 
         //start listening from client
@@ -81,8 +83,13 @@ public class ClientHandler implements Runnable{
                     yaimaServer.redirectChat(new SendMessageCommand(from, to, msg));
                 }
 
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (IOException | BufferUnderflowException e) { //TODO: may need to handle BufferUnderflowException somewhat better
+                //throw new RuntimeException(e);
+                //TODO: get online friends of this user
+                //send them STT message with OFFLINE status
+               yaimaServer.notifyFriendsOfStatusChange(username);
+               yaimaServer.removeFromOnlineUsers(username);
+               break;
             }
         }
 
@@ -157,4 +164,19 @@ public class ClientHandler implements Runnable{
             throw new RuntimeException(e);
         }
     }
+
+    public void sendSTT(String username) {
+        String temp = "STT" + "OFF" + username;
+
+        short x = (short) temp.length();
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -34,4 +34,20 @@ public class YaimaServer implements Runnable{
 
         ch.sendMessage(sendMessageCommand);
     }
+
+    public void notifyFriendsOfStatusChange(String username) {
+        if (username.equals("bob")) {   //TODO: bob is friend of alice, tell alice that bob is offline now
+            ClientHandler ch = onlineUsers.get("alice");
+
+            if (ch == null)
+                throw new RuntimeException("olmaz oyle sey");
+            else {
+                ch.sendSTT(username);
+            }
+        }
+    }
+
+    public void removeFromOnlineUsers(String username) {
+        onlineUsers.remove(username);
+    }
 }
