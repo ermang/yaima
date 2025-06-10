@@ -1,7 +1,7 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.Constant;
-import com.eg.yaima.SendMessageCommand;
+import com.eg.yaima.common.Constant;
+import com.eg.yaima.common.SendMessageCommand;
 import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.Window;

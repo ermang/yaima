@@ -1,4 +1,6 @@
-package com.eg.yaima;
+package com.eg.yaima.server;
+
+import com.eg.yaima.common.SendMessageCommand;
 
 import java.util.HashMap;
 import java.util.Map;

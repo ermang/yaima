@@ -1,6 +1,6 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.Constant;
+import com.eg.yaima.common.Constant;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 

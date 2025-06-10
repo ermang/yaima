@@ -1,6 +1,6 @@
 package com.eg.yaima.client;
 
-import com.eg.yaima.UserStatus;
+import com.eg.yaima.common.UserStatus;
 
 public class Friend {
 

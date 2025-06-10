@@ -1,7 +1,7 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.Constant;
-import com.eg.yaima.SendMessageCommand;
+import com.eg.yaima.common.Constant;
+import com.eg.yaima.common.SendMessageCommand;
 import org.junit.jupiter.api.Test;
 
 public class SampleTest {

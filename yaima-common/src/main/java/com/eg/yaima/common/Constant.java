@@ -1,4 +1,4 @@
-package com.eg.yaima;
+package com.eg.yaima.common;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;

@@ -1,7 +1,7 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.SendMessageCommand;
-import com.eg.yaima.UserStatus;
+import com.eg.yaima.common.SendMessageCommand;
+import com.eg.yaima.common.UserStatus;
 import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;

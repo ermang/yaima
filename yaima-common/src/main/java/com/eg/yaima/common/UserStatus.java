@@ -1,4 +1,4 @@
-package com.eg.yaima;
+package com.eg.yaima.common;
 
 public enum UserStatus {
 

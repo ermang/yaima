@@ -1,4 +1,7 @@
-package com.eg.yaima;
+package com.eg.yaima.server;
+
+import com.eg.yaima.common.Constant;
+import com.eg.yaima.common.SendMessageCommand;
 
 import java.io.IOException;
 import java.net.Socket;

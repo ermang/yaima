@@ -1,8 +1,8 @@
 package com.eg.yaima.cli.client;
 
-import com.eg.yaima.Constant;
-import com.eg.yaima.SendMessageCommand;
-import com.eg.yaima.UserStatus;
+import com.eg.yaima.common.Constant;
+import com.eg.yaima.common.SendMessageCommand;
+import com.eg.yaima.common.UserStatus;
 import com.eg.yaima.client.Friend;
 
 import java.io.IOException;
