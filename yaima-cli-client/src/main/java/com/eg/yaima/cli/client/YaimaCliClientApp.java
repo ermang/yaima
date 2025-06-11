@@ -10,10 +10,12 @@ public class YaimaCliClientApp {
 
 
         Thread thread = new Thread(clientConnection);
-        thread.start();
+
 
         CLI cli = new CLI(clientConnection);
         clientConnection.setCLI(cli);
+
+        thread.start();
         cli.run();
 
         cli.stopClientConnection();

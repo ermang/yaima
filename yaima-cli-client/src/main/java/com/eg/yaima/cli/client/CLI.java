@@ -6,6 +6,8 @@ import com.eg.yaima.client.Friend;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
@@ -71,4 +73,12 @@ public class CLI {
     public void stopClientConnection() {
         clientConnection.stop();
     }
+
+    public void showErrorPopup() {
+        MessageDialogButton mdb = MessageDialog.showMessageDialog(textGUI, "ERROR", "something funny going on try later", MessageDialogButton.OK);
+
+        nextWindow = null;
+        window.close();
+    }
+
 }

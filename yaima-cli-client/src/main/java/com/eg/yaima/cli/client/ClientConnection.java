@@ -4,12 +4,15 @@ import com.eg.yaima.common.Constant;
 import com.eg.yaima.common.SendMessageCommand;
 import com.eg.yaima.common.UserStatus;
 import com.eg.yaima.client.Friend;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class ClientConnection implements Runnable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnection.class);
 
     private String ip;
     private int port;
@@ -80,7 +83,16 @@ public class ClientConnection implements Runnable {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("ERR:", e);
+            while(cli.getGUI() == null) { // wait until lanterna is running
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+            cli.getGUI().getGUIThread().invokeLater(() -> {cli.showErrorPopup();});
         }
 
     }
@@ -93,6 +105,7 @@ public class ClientConnection implements Runnable {
         try {
             socket.getOutputStream().write(tempArr);
         } catch (IOException e) {
+            LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);
         }
 
@@ -135,6 +148,7 @@ public class ClientConnection implements Runnable {
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().write(concatenatedArr);
         } catch (IOException e) {
+            LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);
         }
     }
@@ -145,8 +159,10 @@ public class ClientConnection implements Runnable {
 
     public void stop() {
         try {
-            this.socket.close();
+            if (this.socket != null)
+                this.socket.close();
         } catch (IOException e) {
+            LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);
         }
     }
