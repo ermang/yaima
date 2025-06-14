@@ -1,23 +1,35 @@
-package com.eg.yaima.server;
+package com.eg.yaima.server.other;
 
 import com.eg.yaima.common.SendMessageCommand;
+import com.eg.yaima.server.repo.AppFriendRepo;
+import com.eg.yaima.server.repo.AppUserRepo;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class YaimaServer implements Runnable{
+@Component
+public class YaimaServer {
 
     private final int port;
     private final Map<String, ClientHandler> onlineUsers;
     private final ConnectionAcceptor connectionAcceptor;
 
-    public YaimaServer(int port) {
+    private final AppUserRepo appUserRepo;
+    private final AppFriendRepo appFriendRepo;
+
+    public YaimaServer(@Value("${yaima.server.port}") int port, AppUserRepo appUserRepo, AppFriendRepo appFriendRepo) {
         this.port = port;
         onlineUsers = new HashMap<>();
         this.connectionAcceptor = new ConnectionAcceptor(port, this);
+
+        this.appUserRepo = appUserRepo;
+        this.appFriendRepo = appFriendRepo;
     }
 
-    @Override
+    @PostConstruct
     public void run() {
 
         Thread t = new Thread(connectionAcceptor);
@@ -52,4 +64,5 @@ public class YaimaServer implements Runnable{
     public void removeFromOnlineUsers(String username) {
         onlineUsers.remove(username);
     }
+
 }

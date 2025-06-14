@@ -1,4 +1,4 @@
-package com.eg.yaima.server;
+package com.eg.yaima.server.other;
 
 import com.eg.yaima.common.Constant;
 import com.eg.yaima.common.SendMessageCommand;

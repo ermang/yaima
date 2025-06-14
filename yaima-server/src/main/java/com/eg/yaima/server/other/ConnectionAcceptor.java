@@ -1,4 +1,4 @@
-package com.eg.yaima.server;
+package com.eg.yaima.server.other;
 
 import java.io.IOException;
 import java.net.ServerSocket;

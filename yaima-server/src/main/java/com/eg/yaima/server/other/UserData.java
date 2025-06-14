@@ -1,4 +1,4 @@
-package com.eg.yaima.server;
+package com.eg.yaima.server.other;
 
 public class UserData {
     public final int id;
