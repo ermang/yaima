@@ -1,6 +1,7 @@
 package com.eg.yaima.server.other;
 
 import com.eg.yaima.common.SendMessageCommand;
+import com.eg.yaima.common.UserStatus;
 import com.eg.yaima.server.repo.AppFriendRepo;
 import com.eg.yaima.server.repo.AppUserRepo;
 import jakarta.annotation.PostConstruct;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -63,6 +65,18 @@ public class YaimaServer {
 
     public void removeFromOnlineUsers(String username) {
         onlineUsers.remove(username);
+    }
+
+    public List<String> getFriendsOfUser(String username) {
+        List<String> x = appFriendRepo.findFriendsUsernameList(username);
+
+        return x;
+    }
+
+    public UserStatus getUserStatus(String username) {
+        ClientHandler ch = onlineUsers.get(username);
+
+        return ch == null ? UserStatus.OFFLINE : UserStatus.ONLINE;
     }
 
 }

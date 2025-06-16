@@ -2,13 +2,19 @@ package com.eg.yaima.server.other;
 
 import com.eg.yaima.common.Constant;
 import com.eg.yaima.common.SendMessageCommand;
+import com.eg.yaima.common.UserStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientHandler.class);
 
     private final Socket socket;
     private final YaimaServer yaimaServer;
@@ -39,10 +45,12 @@ public class ClientHandler implements Runnable {
             //TODO: do the login
             //assume login is successful
 
-            //TODO: get friends of logged in user
+            List<String> friendsOfUser = yaimaServer.getFriendsOfUser(username);
             //TODO: check their statuses (online/offline) and send this data to logged in user
-
-        sendFriendSTT("");
+            for (String s : friendsOfUser) {
+                UserStatus userStatus = yaimaServer.getUserStatus(s);
+                sendFriendSTT(s, userStatus);
+            }
 
         } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -98,41 +106,25 @@ public class ClientHandler implements Runnable {
 
     }
 
-    private void sendFriendSTT(String friendsUsername) throws IOException {
 
-        String temp = "STT" + "ONL";
 
-        if (username.equals("alice"))
-            temp = temp + "bob";
-        else if (username.equals("bob"))
-            temp = temp + "alice";
-        else if (username.equals("eve"))
-            temp = temp + "alice";
+    private void sendFriendSTT(String username, UserStatus userStatus)  {
+
+        String temp = "STT" + userStatus.getCode();
+
+        temp = temp + username;
 
         short x = (short) temp.length();
         byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
 
-        socket.getOutputStream().write(bytes);
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
+        } catch (IOException e) {
+            LOGGER.error("ERR:", e);
+            throw new RuntimeException(e);
+        }
 
-        socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
-
-        //TODO: copy paste for now
-
-         temp = "STT" + "ONL";
-
-        if (username.equals("alice"))
-            temp = temp + "eve";
-        else if (username.equals("bob"))
-            temp = temp + "eve";
-        else if (username.equals("eve"))
-            temp = temp + "bob";
-
-         x = (short) temp.length();
-         bytes = ByteBuffer.allocate(2).putShort(x).array();
-
-        socket.getOutputStream().write(bytes);
-
-        socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
     }
 
     public void sendMessage(SendMessageCommand smc) {
@@ -164,6 +156,7 @@ public class ClientHandler implements Runnable {
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().write(concatenatedArr);
         } catch (IOException e) {
+            LOGGER.error("ERR:", e);
             throw new RuntimeException(e);
         }
     }
@@ -178,6 +171,7 @@ public class ClientHandler implements Runnable {
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
         } catch (IOException e) {
+            LOGGER.error("ERR:", e);
             throw new RuntimeException(e);
         }
     }
