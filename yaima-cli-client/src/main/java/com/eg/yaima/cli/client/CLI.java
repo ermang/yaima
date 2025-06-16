@@ -75,7 +75,7 @@ public class CLI {
     }
 
     public void showErrorPopup() {
-        MessageDialogButton mdb = MessageDialog.showMessageDialog(textGUI, "ERROR", "something funny going on try later", MessageDialogButton.OK);
+        MessageDialogButton mdb = MessageDialog.showMessageDialog(textGUI, "ERROR", "something funny going on, try later", MessageDialogButton.OK);
 
         nextWindow = null;
         window.close();

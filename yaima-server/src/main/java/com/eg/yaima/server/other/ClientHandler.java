@@ -52,6 +52,8 @@ public class ClientHandler implements Runnable {
                 sendFriendSTT(s, userStatus);
             }
 
+            yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.ONLINE);
+
         } catch (IOException e) {
                 throw new RuntimeException(e);
                 //TODO: bunu da handle et
@@ -98,7 +100,7 @@ public class ClientHandler implements Runnable {
                 //throw new RuntimeException(e);
                 //TODO: get online friends of this user
                 //send them STT message with OFFLINE status
-               yaimaServer.notifyFriendsOfStatusChange(username);
+               yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.OFFLINE);
                yaimaServer.removeFromOnlineUsers(username);
                break;
             }
@@ -108,7 +110,7 @@ public class ClientHandler implements Runnable {
 
 
 
-    private void sendFriendSTT(String username, UserStatus userStatus)  {
+    public void sendFriendSTT(String username, UserStatus userStatus)  {
 
         String temp = "STT" + userStatus.getCode();
 
@@ -155,21 +157,6 @@ public class ClientHandler implements Runnable {
         try {
             socket.getOutputStream().write(bytes);
             socket.getOutputStream().write(concatenatedArr);
-        } catch (IOException e) {
-            LOGGER.error("ERR:", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void sendSTT(String username) {
-        String temp = "STT" + "OFF" + username;
-
-        short x = (short) temp.length();
-        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
-
-        try {
-            socket.getOutputStream().write(bytes);
-            socket.getOutputStream().write(temp.getBytes(Constant.CHARSET));
         } catch (IOException e) {
             LOGGER.error("ERR:", e);
             throw new RuntimeException(e);

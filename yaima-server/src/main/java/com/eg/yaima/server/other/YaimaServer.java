@@ -22,7 +22,9 @@ public class YaimaServer {
     private final AppUserRepo appUserRepo;
     private final AppFriendRepo appFriendRepo;
 
-    public YaimaServer(@Value("${yaima.server.port}") int port, AppUserRepo appUserRepo, AppFriendRepo appFriendRepo) {
+    public YaimaServer(@Value("${yaima.server.port}") int port,
+                       AppUserRepo appUserRepo,
+                       AppFriendRepo appFriendRepo) {
         this.port = port;
         onlineUsers = new HashMap<>();
         this.connectionAcceptor = new ConnectionAcceptor(port, this);
@@ -51,16 +53,17 @@ public class YaimaServer {
         ch.sendMessage(sendMessageCommand);
     }
 
-    public void notifyFriendsOfStatusChange(String username) {
-        if (username.equals("bob")) {   //TODO: bob is friend of alice, tell alice that bob is offline now
-            ClientHandler ch = onlineUsers.get("alice");
+    public void notifyFriendsOfStatusChange(String username, UserStatus userStatus) {
+        List<String> x = getFriendsOfUser(username);
 
-            if (ch == null)
-                throw new RuntimeException("olmaz oyle sey");
-            else {
-                ch.sendSTT(username);
+        for(String y : x) {
+            ClientHandler ch = onlineUsers.get(y);
+
+            if (ch != null) {
+                ch.sendFriendSTT(username, userStatus);
             }
         }
+
     }
 
     public void removeFromOnlineUsers(String username) {
