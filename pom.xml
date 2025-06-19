@@ -11,6 +11,7 @@
 
     <modules>
         <module>yaima-cli-client</module>
+        <module>yaima-fx-client</module>
         <module>yaima-client</module>
         <module>yaima-server</module>
         <module>yaima-common</module>

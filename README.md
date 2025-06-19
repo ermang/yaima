@@ -10,6 +10,12 @@ something something
 
 something something 
 
+#### subsubheading
+
+##### YAIMA-FX-CLIENT
+
+###### sub
+
 
 
 How will clients discover each other? (Server as directory + signaling)
@@ -97,3 +103,18 @@ hack solution but works
 
 
 
+##### YAIMA-FX-CLIENT
+
+A JavaFX based client for yaima
+
+```
+--module-path
+/home/ermang/Downloads/openjavafx17/javafx-sdk-17.0.15/lib/
+--add-exports=javafx.base/com.sun.javafx.reflect=ALL-UNNAMED
+--add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED
+--add-exports=javafx.fxml/com.sun.javafx.fxml=ALL-UNNAMED
+--add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED
+--add-exports=javafx.base/com.sun.javafx.beans=ALL-UNNAMED
+--add-modules
+javafx.controls
+```
