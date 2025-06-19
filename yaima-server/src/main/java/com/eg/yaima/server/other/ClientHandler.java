@@ -55,8 +55,9 @@ public class ClientHandler implements Runnable {
             yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.ONLINE);
 
         } catch (IOException e) {
-                throw new RuntimeException(e);
-                //TODO: bunu da handle et
+            LOGGER.error("ERR:", e);
+            throw new RuntimeException(e);
+            //TODO: bunu da handle et
         }
 
         //start listening from client
@@ -100,6 +101,7 @@ public class ClientHandler implements Runnable {
                 //throw new RuntimeException(e);
                 //TODO: get online friends of this user
                 //send them STT message with OFFLINE status
+               LOGGER.error("ERR:", e);
                yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.OFFLINE);
                yaimaServer.removeFromOnlineUsers(username);
                break;
