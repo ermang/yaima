@@ -2,7 +2,14 @@
 
 yet another instant messaging application 
 
-## subheading
+# INDEX
+
+- YAIMA-SERVER
+- YAIMA-CLI-CLIENT
+- YAIMA-FX-CLIENT
+- YAIMA-CLIENT
+- YAIMA-COMMON
+
 
 something something
 
@@ -118,3 +125,9 @@ A JavaFX based client for yaima
 --add-modules
 javafx.controls
 ```
+
+FXMLLoader loader = new FXMLLoader(getClass().getResource("/MyView.fxml"));
+Parent root = loader.load();  // <-- this creates the controller internally
+
+MyController controller = loader.getController();  // get the created controller instance
+controller.setService(new MyService());            // inject your service here
