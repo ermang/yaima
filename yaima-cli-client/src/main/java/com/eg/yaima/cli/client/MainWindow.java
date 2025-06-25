@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class MainWindow {
-    private final ClientConnection clientConnection;
+    private final CLIClientConnection CLIClientConnection;
     private final Map<String, List<String>> friendChatHistory;
     private String activeChat;
     private Label activeChatLabel;
@@ -22,8 +22,8 @@ public class MainWindow {
     private Panel friendPanel;
     private Panel friendListPanel;
 
-    public MainWindow(ClientConnection clientConnection) {
-        this.clientConnection = clientConnection;
+    public MainWindow(CLIClientConnection CLIClientConnection) {
+        this.CLIClientConnection = CLIClientConnection;
         friendChatHistory = new HashMap<>();
     }
 
@@ -152,7 +152,7 @@ public class MainWindow {
                         sendTextBox.setInputFilter((interactable, key) -> {
                             if (key.getKeyType() == KeyType.Enter) {
                                 System.out.println("enter pressed");
-                                SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
+                                SendMessageCommand smc = new SendMessageCommand(CLIClientConnection.getUsername(), friendButton.getLabel(), sendTextBox.getText());
 
                                 chatTextBox.addLine("you: " + sendTextBox.getText());
                                 updateFriendChatHistory(activeChat, "you: " + sendTextBox.getText());
@@ -161,7 +161,7 @@ public class MainWindow {
 
                                 sendTextBox.setText("");
 
-                                clientConnection.sendMessage(smc);
+                                CLIClientConnection.sendMessage(smc);
                                 return false;
                             }
                             return true;

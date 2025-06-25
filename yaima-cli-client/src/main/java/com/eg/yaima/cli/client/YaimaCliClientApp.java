@@ -6,14 +6,14 @@ public class YaimaCliClientApp {
 
     public static void main(String[] args) throws IOException {
 
-        ClientConnection clientConnection = new ClientConnection("127.0.0.1", 8080);
+        CLIClientConnection CLIClientConnection = new CLIClientConnection("127.0.0.1", 8080);
 
 
-        Thread thread = new Thread(clientConnection);
+        Thread thread = new Thread(CLIClientConnection);
 
 
-        CLI cli = new CLI(clientConnection);
-        clientConnection.setCLI(cli);
+        CLI cli = new CLI(CLIClientConnection);
+        CLIClientConnection.setUIHandler(cli);
 
         thread.start();
         cli.run();

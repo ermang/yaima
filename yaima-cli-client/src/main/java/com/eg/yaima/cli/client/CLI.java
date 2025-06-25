@@ -3,6 +3,7 @@ package com.eg.yaima.cli.client;
 import com.eg.yaima.common.Constant;
 import com.eg.yaima.common.SendMessageCommand;
 import com.eg.yaima.client.Friend;
+import com.eg.yaima.common.UIHandler;
 import com.googlecode.lanterna.gui2.MultiWindowTextGUI;
 import com.googlecode.lanterna.gui2.Window;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -13,23 +14,23 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
 import java.io.IOException;
 
-public class CLI {
-    private final ClientConnection clientConnection;
+public class CLI implements UIHandler {
+    private final CLIClientConnection CLIClientConnection;
     private LoginWindow loginWindow;
     private final MainWindow mainWindow;
     private WindowBasedTextGUI textGUI;
     private Window window;
     private Constant.WINDOW nextWindow = null;
 
-    public CLI(ClientConnection clientConnection) {
+    public CLI(CLIClientConnection CLIClientConnection) {
 
-        this.clientConnection = clientConnection;
+        this.CLIClientConnection = CLIClientConnection;
 
-        this.mainWindow = new MainWindow(clientConnection);
+        this.mainWindow = new MainWindow(CLIClientConnection);
     }
 
     public void run() throws IOException {
-        this.loginWindow = new LoginWindow(this, clientConnection);
+        this.loginWindow = new LoginWindow(this, CLIClientConnection);
 
         DefaultTerminalFactory terminalFactory = new DefaultTerminalFactory();
         Screen screen = terminalFactory.createScreen();
@@ -71,7 +72,7 @@ public class CLI {
     }
 
     public void stopClientConnection() {
-        clientConnection.stop();
+        CLIClientConnection.stop();
     }
 
     public void showErrorPopup() {

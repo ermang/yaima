@@ -7,11 +7,11 @@ import com.googlecode.lanterna.gui2.*;
 public class LoginWindow {
 
     private final CLI cli;
-    private final ClientConnection clientConnection;
+    private final CLIClientConnection CLIClientConnection;
 
-    public LoginWindow(CLI cli, ClientConnection clientConnection) {
+    public LoginWindow(CLI cli, CLIClientConnection CLIClientConnection) {
         this.cli = cli;
-        this.clientConnection = clientConnection;
+        this.CLIClientConnection = CLIClientConnection;
     }
 
     public Window getLoginWindow() {
@@ -49,7 +49,7 @@ public class LoginWindow {
         Button loginButton = new Button("sign in", () -> {
             System.out.println("button clicked");
             String username = usernameTextBox.getText();
-            boolean loginResult = clientConnection.login(username);
+            boolean loginResult = CLIClientConnection.login(username);
             if (loginResult)
                 cli.setNextWindow(Constant.WINDOW.MAIN);
             window.close();

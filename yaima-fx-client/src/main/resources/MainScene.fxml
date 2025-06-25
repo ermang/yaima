@@ -28,5 +28,7 @@
 
     <TextArea text="hi" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
+    <ListView fx:id="buttonListView" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
     <TextArea text="type your thing here" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 </GridPane>

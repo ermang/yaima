@@ -1,5 +1,6 @@
 package com.eg.yaima.fx.client.controller;
 
+import com.eg.yaima.common.ClientConnection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,12 +19,17 @@ public class LoginSceneController {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    private ClientConnection clientConnection;
 
     // Optional: initialize method called after FXML loaded
     @FXML
     public void initialize() {
         System.out.println("FXML Loaded");
         //label.setText("Hello from Controller!");
+    }
+
+    public void setClientConnection(ClientConnection cc) {
+        this.clientConnection = cc;
     }
 
     @FXML
@@ -37,8 +43,14 @@ public class LoginSceneController {
         alert.setContentText("Username: " + username + "\nPassword: " + password);
         alert.showAndWait();
 
+        clientConnection.login(username);
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainScene.fxml"));
         Parent root = loader.load();
+
+        MainSceneController mainSceneController = loader.getController();
+        mainSceneController.setClientConnection(clientConnection);
+        clientConnection.setUIHandler(mainSceneController);
 
         Scene newScene = new Scene(root);
 

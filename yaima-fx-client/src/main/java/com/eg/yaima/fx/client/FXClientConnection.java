@@ -1,9 +1,9 @@
-package com.eg.yaima.cli.client;
+package com.eg.yaima.fx.client;
 
-import com.eg.yaima.common.Constant;
-import com.eg.yaima.common.SendMessageCommand;
-import com.eg.yaima.common.UserStatus;
 import com.eg.yaima.client.Friend;
+import com.eg.yaima.common.*;
+import com.eg.yaima.fx.client.controller.MainSceneController;
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,16 +11,16 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-public class ClientConnection implements Runnable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnection.class);
+public class FXClientConnection implements ClientConnection {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FXClientConnection.class);
 
     private String ip;
     private int port;
     private Socket socket;
-    private CLI cli;
+    private MainSceneController uiHandler;
     private String username;
 
-    public ClientConnection(String ip, int port) {
+    public FXClientConnection(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
@@ -49,9 +49,9 @@ public class ClientConnection implements Runnable {
                     String friend = new String(tempArr, 6, tempArr.length - 6, Constant.CHARSET);
                     System.out.println(friend);
 
-                    cli.getGUI().getGUIThread().invokeLater(() -> {
+                    Platform.runLater(() -> {
                         Friend f = new Friend(friend, status.equals("ONL") ? UserStatus.ONLINE : UserStatus.OFFLINE);
-                        cli.updateFriendListPanel(f);
+                        uiHandler.updateFriendListPanel(f);
                     });
                 } else if (packetType.equals("SMS")) {
                     int fromIndex = -1;
@@ -75,8 +75,8 @@ public class ClientConnection implements Runnable {
                     String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
                     String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
 
-                    cli.getGUI().getGUIThread().invokeLater(() -> {
-                        cli.updateChat(new SendMessageCommand(from, to, msg));
+                    Platform.runLater(() -> {
+                        uiHandler.updateChat(new SendMessageCommand(from, to, msg));
                     });
 
                 }
@@ -84,7 +84,7 @@ public class ClientConnection implements Runnable {
 
         } catch (IOException e) {
             LOGGER.error("ERR:", e);
-            while(cli.getGUI() == null) { // wait until lanterna is running
+            while (!Platform.isFxApplicationThread()) { // wait until javafx is running
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
@@ -92,11 +92,15 @@ public class ClientConnection implements Runnable {
                 }
             }
 
-            cli.getGUI().getGUIThread().invokeLater(() -> {cli.showErrorPopup();});
+            Platform.runLater(() -> {
+               // uiHandler.showErrorPopup();
+                }
+            );
         }
 
     }
 
+    @Override
     public boolean login(String username) {
 
         String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
@@ -114,10 +118,15 @@ public class ClientConnection implements Runnable {
         return true;
     }
 
-    public void setCLI(CLI cli) {
-        this.cli = cli;
+    @Override
+    public void setUIHandler(UIHandler uiHandler) {
+        if (uiHandler instanceof MainSceneController)
+            this.uiHandler = (MainSceneController) uiHandler;
+        else
+            throw new UnsupportedOperationException("olmaz oyle sey");
     }
 
+    @Override
     public void sendMessage(SendMessageCommand smc) {
 
         byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
@@ -153,10 +162,12 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
 
+    @Override
     public void stop() {
         try {
             if (this.socket != null)
