@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 public class FXClientConnection implements ClientConnection {
     private static final Logger LOGGER = LoggerFactory.getLogger(FXClientConnection.class);
 
+    private final CommandDeserializer commandDeserializer;
     private String ip;
     private int port;
     private Socket socket;
@@ -23,6 +24,7 @@ public class FXClientConnection implements ClientConnection {
     public FXClientConnection(String ip, int port) {
         this.ip = ip;
         this.port = port;
+        this.commandDeserializer = new CommandDeserializer();
     }
 
     @Override
@@ -54,29 +56,30 @@ public class FXClientConnection implements ClientConnection {
                         uiHandler.updateFriendListPanel(f);
                     });
                 } else if (packetType.equals("SMS")) {
-                    int fromIndex = -1;
-                    int toIndex = -1;
-
-                    for (int i = 0; i < tempArr.length; i++) {
-                        if (tempArr[i] == 0) {
-                            fromIndex = i;
-                            break;
-                        }
-                    }
-
-                    for (int i = fromIndex+1; i < tempArr.length; i++) {
-                        if (tempArr[i] == 0) {
-                            toIndex = i;
-                            break;
-                        }
-                    }
-
-                    String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
-                    String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
-                    String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
+//                    int fromIndex = -1;
+//                    int toIndex = -1;
+//
+//                    for (int i = 0; i < tempArr.length; i++) {
+//                        if (tempArr[i] == 0) {
+//                            fromIndex = i;
+//                            break;
+//                        }
+//                    }
+//
+//                    for (int i = fromIndex+1; i < tempArr.length; i++) {
+//                        if (tempArr[i] == 0) {
+//                            toIndex = i;
+//                            break;
+//                        }
+//                    }
+//
+//                    String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
+//                    String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
+//                    String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
+                    SendMessageCommand smc = commandDeserializer.desserialize(tempArr);
 
                     Platform.runLater(() -> {
-                        uiHandler.updateChat(new SendMessageCommand(from, to, msg));
+                        uiHandler.updateChat(smc);
                     });
 
                 }
@@ -129,26 +132,28 @@ public class FXClientConnection implements ClientConnection {
     @Override
     public void sendMessage(SendMessageCommand smc) {
 
-        byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
-        byte[] fromArr = smc.from.getBytes(Constant.CHARSET);
-        byte[] toArr = smc.to.getBytes(Constant.CHARSET);
-        byte[] messageArr = smc.message.getBytes(Constant.CHARSET);
+//        byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
+//        byte[] fromArr = smc.from.getBytes(Constant.CHARSET);
+//        byte[] toArr = smc.to.getBytes(Constant.CHARSET);
+//        byte[] messageArr = smc.message.getBytes(Constant.CHARSET);
+//
+//        byte[] concatenatedArr = new byte[packetTypeArr.length + fromArr.length + 1 + toArr.length + 1 + messageArr.length];
+//
+//        int index = 0;
+//
+//        System.arraycopy(packetTypeArr, 0, concatenatedArr, 0, packetTypeArr.length);
+//        index = index + packetTypeArr.length;
+//        System.arraycopy(fromArr, 0, concatenatedArr, index, fromArr.length);
+//        index = index + fromArr.length;
+//        concatenatedArr[index] = 0x0;
+//        index = index + 1;
+//        System.arraycopy(toArr, 0, concatenatedArr, index, toArr.length);
+//        index = index + toArr.length;
+//        concatenatedArr[index] = 0x0;
+//        index = index + 1;
+//        System.arraycopy(messageArr, 0, concatenatedArr, index, messageArr.length);
 
-        byte[] concatenatedArr = new byte[packetTypeArr.length + fromArr.length + 1 + toArr.length + 1 + messageArr.length];
-
-        int index = 0;
-
-        System.arraycopy(packetTypeArr, 0, concatenatedArr, 0, packetTypeArr.length);
-        index = index + packetTypeArr.length;
-        System.arraycopy(fromArr, 0, concatenatedArr, index, fromArr.length);
-        index = index + fromArr.length;
-        concatenatedArr[index] = 0x0;
-        index = index + 1;
-        System.arraycopy(toArr, 0, concatenatedArr, index, toArr.length);
-        index = index + toArr.length;
-        concatenatedArr[index] = 0x0;
-        index = index + 1;
-        System.arraycopy(messageArr, 0, concatenatedArr, index, messageArr.length);
+        byte[] concatenatedArr = smc.serialize();
 
         short x = (short) concatenatedArr.length;
         byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();

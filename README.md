@@ -1,6 +1,6 @@
 # YAIMA
 
-yet another instant messaging application 
+Yet Another Instant Messaging Application 
 
 # INDEX
 
@@ -112,7 +112,9 @@ hack solution but works
 
 ##### YAIMA-FX-CLIENT
 
-A JavaFX based client for yaima
+A JavaFX based client for yaima  
+
+copy paste below to intellij add to vm options check the path!  
 
 ```
 --module-path
@@ -125,6 +127,17 @@ A JavaFX based client for yaima
 --add-modules
 javafx.controls
 ```
+
+to run from terminal go to root folder and   
+
+```
+cd ~/project/yaima  
+mvn install -N  
+mvn install -pl yaima-common,yaima-client 
+cd yaima-fx-client
+mvn javafx:run 
+```
+
 
 FXMLLoader loader = new FXMLLoader(getClass().getResource("/MyView.fxml"));
 Parent root = loader.load();  // <-- this creates the controller internally

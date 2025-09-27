@@ -30,6 +30,8 @@ public class ClientHandler implements Runnable {
         String remoteIp = socket.getInetAddress().getHostAddress();
         int remotePort = socket.getPort();
 
+        LOGGER.debug("Client with ip:{} port:{} connected", remoteIp, remotePort);
+
         byte[] tempArr = null;
 
         try {
@@ -44,8 +46,10 @@ public class ClientHandler implements Runnable {
 
             //TODO: do the login
             //assume login is successful
+            LOGGER.debug("Client with ip:{} port:{} username:{} connected", remoteIp, remotePort, username);
 
             List<String> friendsOfUser = yaimaServer.getFriendsOfUser(username);
+            LOGGER.debug("Client with ip:{} port:{} username:{} friends:{}", remoteIp, remotePort, username, friendsOfUser);
             //TODO: check their statuses (online/offline) and send this data to logged in user
             for (String s : friendsOfUser) {
                 UserStatus userStatus = yaimaServer.getUserStatus(s);
@@ -132,26 +136,8 @@ public class ClientHandler implements Runnable {
     }
 
     public void sendMessage(SendMessageCommand smc) {
-        byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
-        byte[] fromArr = smc.from.getBytes(Constant.CHARSET);
-        byte[] toArr = smc.to.getBytes(Constant.CHARSET);
-        byte[] messageArr = smc.message.getBytes(Constant.CHARSET);
 
-        byte[] concatenatedArr = new byte[packetTypeArr.length + fromArr.length + 1 + toArr.length + 1 + messageArr.length];
-
-        int index = 0;
-
-        System.arraycopy(packetTypeArr, 0, concatenatedArr, 0, packetTypeArr.length);
-        index = index + packetTypeArr.length;
-        System.arraycopy(fromArr, 0, concatenatedArr, index, fromArr.length);
-        index = index + fromArr.length;
-        concatenatedArr[index] = 0x0;
-        index = index + 1;
-        System.arraycopy(toArr, 0, concatenatedArr, index, toArr.length);
-        index = index + toArr.length;
-        concatenatedArr[index] = 0x0;
-        index = index + 1;
-        System.arraycopy(messageArr, 0, concatenatedArr, index, messageArr.length);
+        byte[] concatenatedArr = smc.serialize();
 
         short x = (short) concatenatedArr.length;
         byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
