@@ -2,7 +2,7 @@ package com.eg.yaima.common;
 
 public class CommandDeserializer {
 
-    public SendMessageCommand desserialize(byte[] tempArr) {
+    public SendMessageCommand deserialize(byte[] tempArr) {
         int fromIndex = -1;
         int toIndex = -1;
 
