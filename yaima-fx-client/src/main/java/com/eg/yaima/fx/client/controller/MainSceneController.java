@@ -5,6 +5,8 @@ import com.eg.yaima.common.ClientConnection;
 import com.eg.yaima.common.SendMessageCommand;
 import com.eg.yaima.common.UIHandler;
 import com.eg.yaima.common.UserStatus;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,6 +14,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +26,7 @@ public class MainSceneController implements UIHandler {
     private ClientConnection clientConnection;
     private String activeChat;
     private Map<String, List<String>> friendChatHistory;
+    private Map<String, Timeline>  usernameBlinkAnimationMap;
 
     @FXML
     private ListView<HBox> buttonListView;
@@ -34,6 +38,7 @@ public class MainSceneController implements UIHandler {
     @FXML
     public void initialize() {
         friendChatHistory = new HashMap<>();
+        usernameBlinkAnimationMap = new HashMap<>();
 
         sendTextArea.setOnKeyPressed(event -> {
             if (activeChat != null && event.getCode() == KeyCode.ENTER) {
@@ -56,6 +61,9 @@ public class MainSceneController implements UIHandler {
 
     public void updateFriendListPanel(Friend f) {
 
+        //first is Label statusLabel
+        //second is Button friendButton
+        //third is blinking thingy if there are unread messages in chat
         boolean friendExists = false;
 
         for(HBox hbox: buttonListView.getItems()) {
@@ -64,6 +72,10 @@ public class MainSceneController implements UIHandler {
                 Label existingFriendLabel = (Label) hbox.getChildren().get(0);
                 existingFriendLabel.setStyle(f.userStatus == UserStatus.ONLINE ? "-fx-background-color: green;" : "-fx-background-color: gray;" );
                 existingFriendButton.setDisable(f.userStatus == UserStatus.OFFLINE);
+//                //
+//                if (hbox.getChildren().size() == 3)
+//                    hbox.getChildren().remove(hbox.getChildren().get(2));
+//                //
                 friendExists = true;
                 break;
             }
@@ -77,6 +89,13 @@ public class MainSceneController implements UIHandler {
 
             friendButton.setOnAction(event -> {
                 activeChat = f.username;
+                //
+                HBox hbox = (HBox)friendButton.getParent();
+                if (hbox.getChildren().size() == 3) {
+                    hbox.getChildren().remove(hbox.getChildren().get(2));
+                    usernameBlinkAnimationMap.remove(friendButton.getText());
+                }
+                //
                 reloadChatFromHistory();
                 sendTextArea.setText("");
             });
@@ -90,9 +109,39 @@ public class MainSceneController implements UIHandler {
     public void updateChat(SendMessageCommand sendMessageCommand) {
         if (activeChat != null && activeChat.equals(sendMessageCommand.from)) {
             chatTextArea.appendText(sendMessageCommand.from + ": " + sendMessageCommand.message + "\n");
+        } else {
+            addBlinkingLabelForUnreadMessage(sendMessageCommand);
         }
 
         updateFriendChatHistory(sendMessageCommand.from, sendMessageCommand.from + ": " + sendMessageCommand.message);
+    }
+
+    private void addBlinkingLabelForUnreadMessage(SendMessageCommand sendMessageCommand) {
+
+        if (usernameBlinkAnimationMap.containsKey(sendMessageCommand.from))
+            return;
+
+        for(HBox hbox: buttonListView.getItems()) {
+            Button existingFriendButton = (Button) hbox.getChildren().get(1);
+            if (existingFriendButton.getText().equals(sendMessageCommand.from)) {
+                //
+                Label unreadLabel = new Label("!");
+                unreadLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: red;");
+
+                Timeline blinkTimeline = new Timeline(
+                        new KeyFrame(Duration.seconds(0.5), e -> unreadLabel.setVisible(!unreadLabel.isVisible()))
+                );
+                blinkTimeline.setCycleCount(Timeline.INDEFINITE);
+                blinkTimeline.play();
+                 //
+
+                usernameBlinkAnimationMap.put(sendMessageCommand.from, blinkTimeline);
+                hbox.getChildren().add(unreadLabel);
+            }
+
+
+
+        }
     }
 
     private void updateFriendChatHistory(String from, String message) {
