@@ -189,7 +189,31 @@ public class MainSceneController implements UIHandler {
     public void updateWaitingFriendRequests(SendFriendRequestCommand sfc) {
         Label label = new Label(sfc.from);
         Button yesButton = new Button("Yes");
+        yesButton.setOnAction(event -> {
+            SendFriendAnswerCommand sfa = new SendFriendAnswerCommand(sfc.from, sfc.to, true);
+            clientConnection.senfFriendAnswer(sfa);
+            for (int i=0;i < waitingRequestsListView.getItems().size();i++) {
+                HBox hbox = waitingRequestsListView.getItems().get(i);
+                Label dynamicLabel = (Label) hbox.getChildren().get(0);
+                if (dynamicLabel.getText().equals(sfc.from)) {
+                    waitingRequestsListView.getItems().remove(i);
+                    break;
+                }
+            }
+        });
         Button noButton = new Button("No");
+        noButton.setOnAction(event -> {
+            SendFriendAnswerCommand sfa = new SendFriendAnswerCommand(sfc.from, sfc.to, false);
+            clientConnection.senfFriendAnswer(sfa);
+            for (int i=0;i < waitingRequestsListView.getItems().size();i++) {
+                HBox hbox = waitingRequestsListView.getItems().get(i);
+                Label dynamicLabel = (Label) hbox.getChildren().get(0);
+                if (dynamicLabel.getText().equals(sfc.from)) {
+                    waitingRequestsListView.getItems().remove(i);
+                    break;
+                }
+            }
+        });
         HBox hBox = new HBox(10, label, yesButton, noButton);
         waitingRequestsListView.getItems().add(hBox);
     }

@@ -163,4 +163,20 @@ public class FXClientConnection implements ClientConnection {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void senfFriendAnswer(SendFriendAnswerCommand sfa) {
+        byte[] concatenatedArr = sfa.serialize();
+
+        short x = (short) concatenatedArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(concatenatedArr);
+        } catch (IOException e) {
+            LOGGER.error("ERR: ", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

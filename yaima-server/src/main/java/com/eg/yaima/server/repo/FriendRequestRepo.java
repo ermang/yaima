@@ -12,4 +12,6 @@ public interface FriendRequestRepo extends JpaRepository<FriendRequest, Long> {
             "    FROM FriendRequest fr" +
             "    WHERE fr.to.username = :username")
     List<FriendRequest> findAllByAsd(String username);
+
+    void deleteByFromUsernameAndToUsername(String fromUsername, String toUsername);
 }

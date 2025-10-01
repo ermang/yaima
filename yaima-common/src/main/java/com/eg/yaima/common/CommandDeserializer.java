@@ -54,4 +54,31 @@ public class CommandDeserializer {
 
         return sfc;
     }
+
+    public SendFriendAnswerCommand deserializeSendFriendAnswerCommand(byte[] tempArr) {
+        int fromIndex = -1;
+        int toIndex = -1;
+
+        for (int i = 0; i < tempArr.length; i++) {
+            if (tempArr[i] == 0) {
+                fromIndex = i;
+                break;
+            }
+        }
+
+        for (int i = fromIndex+1; i < tempArr.length; i++) {
+            if (tempArr[i] == 0) {
+                toIndex = i;
+                break;
+            }
+        }
+
+        String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
+        String to = new String(tempArr, fromIndex+1, tempArr.length-fromIndex-2, Constant.CHARSET);
+        boolean accepted = new String(tempArr, tempArr.length -1, 1, Constant.CHARSET).equals("Y") ? true : false;
+
+        SendFriendAnswerCommand sfa = new SendFriendAnswerCommand(from, to, accepted);
+
+        return sfa;
+    }
 }

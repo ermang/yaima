@@ -107,9 +107,12 @@ public class ClientHandler implements Runnable {
 
                     yaimaServer.redirectChat(new SendMessageCommand(from, to, msg));
                 } else if (packetType.equals("SFR")) {
-
                     SendFriendRequestCommand sfc = commandDeserializer.deserializeSendFriendRequestCommand(tempArr);
                     yaimaServer.redirectFriendRequest(sfc);
+                } else if (packetType.equals("SFA")) {
+                    SendFriendAnswerCommand sfa = commandDeserializer.deserializeSendFriendAnswerCommand(tempArr);
+                    yaimaServer.processSendFriendAnswerCommand(sfa);
+                    //sendFriendSTT(s, userStatus);
                 }
 
             } catch (IOException | BufferUnderflowException e) { //TODO: may need to handle BufferUnderflowException somewhat better

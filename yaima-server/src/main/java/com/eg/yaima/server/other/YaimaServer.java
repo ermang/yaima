@@ -1,8 +1,10 @@
 package com.eg.yaima.server.other;
 
+import com.eg.yaima.common.SendFriendAnswerCommand;
 import com.eg.yaima.common.SendFriendRequestCommand;
 import com.eg.yaima.common.SendMessageCommand;
 import com.eg.yaima.common.UserStatus;
+import com.eg.yaima.server.entity.AppFriend;
 import com.eg.yaima.server.entity.AppUser;
 import com.eg.yaima.server.entity.FriendRequest;
 import com.eg.yaima.server.repo.AppFriendRepo;
@@ -13,10 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 @Component
 public class YaimaServer {
@@ -24,6 +28,7 @@ public class YaimaServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(YaimaServer.class);
 
     private final int port;
+    private final YaimaServerHelper yaimaServerHelper;
     private final Map<String, ClientHandler> onlineUsers;
     private final ConnectionAcceptor connectionAcceptor;
 
@@ -32,10 +37,12 @@ public class YaimaServer {
     private final FriendRequestRepo friendRequestRepo;
 
     public YaimaServer(@Value("${yaima.server.port}") int port,
+                       YaimaServerHelper yaimaServerHelper,
                        AppUserRepo appUserRepo,
                        AppFriendRepo appFriendRepo,
                        FriendRequestRepo friendRequestRepo) {
         this.port = port;
+        this.yaimaServerHelper = yaimaServerHelper;
         onlineUsers = new HashMap<>();
         this.connectionAcceptor = new ConnectionAcceptor(port, this);
 
@@ -117,5 +124,25 @@ public class YaimaServer {
         List<FriendRequest> friendRequestList = friendRequestRepo.findAllByAsd(username);
 
         return friendRequestList;
+    }
+
+    public void processSendFriendAnswerCommand(SendFriendAnswerCommand sfa) {
+        yaimaServerHelper.processSendFriendAnswerCommand(sfa);
+
+        if (sfa.accepted) {
+            ClientHandler ch = onlineUsers.get(sfa.from);
+
+            if (ch != null) {
+                ch.sendFriendSTT(sfa.to, onlineUsers.get(sfa.to) != null ? UserStatus.ONLINE : UserStatus.OFFLINE);
+            }
+
+            ClientHandler ch2 = onlineUsers.get(sfa.to);
+
+            if (ch2 != null) {
+                ch2.sendFriendSTT(sfa.from, onlineUsers.get(sfa.from) != null ? UserStatus.ONLINE : UserStatus.OFFLINE);
+            }
+        } else
+            LOGGER.debug("What to do when friend request rejected ???");
+
     }
 }

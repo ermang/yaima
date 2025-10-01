@@ -15,4 +15,7 @@ public interface ClientConnection extends Runnable {
     void stop();
 
     void sendFriendRequest(SendFriendRequestCommand sfc);
+
+
+    void senfFriendAnswer(SendFriendAnswerCommand sfa);
 }
