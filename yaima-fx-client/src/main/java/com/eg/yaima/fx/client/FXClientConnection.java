@@ -63,6 +63,11 @@ public class FXClientConnection implements ClientConnection {
                         uiHandler.updateChat(smc);
                     });
 
+                } else if (packetType.equals("SFR")) {
+                    SendFriendRequestCommand sfc = commandDeserializer.deserializeSendFriendRequestCommand(tempArr);
+                    int x = 5;
+
+                   Platform.runLater(() -> uiHandler.updateWaitingFriendRequests(sfc));
                 }
             }
 
@@ -113,27 +118,6 @@ public class FXClientConnection implements ClientConnection {
     @Override
     public void sendMessage(SendMessageCommand smc) {
 
-//        byte[] packetTypeArr = "SMS".getBytes(Constant.CHARSET);
-//        byte[] fromArr = smc.from.getBytes(Constant.CHARSET);
-//        byte[] toArr = smc.to.getBytes(Constant.CHARSET);
-//        byte[] messageArr = smc.message.getBytes(Constant.CHARSET);
-//
-//        byte[] concatenatedArr = new byte[packetTypeArr.length + fromArr.length + 1 + toArr.length + 1 + messageArr.length];
-//
-//        int index = 0;
-//
-//        System.arraycopy(packetTypeArr, 0, concatenatedArr, 0, packetTypeArr.length);
-//        index = index + packetTypeArr.length;
-//        System.arraycopy(fromArr, 0, concatenatedArr, index, fromArr.length);
-//        index = index + fromArr.length;
-//        concatenatedArr[index] = 0x0;
-//        index = index + 1;
-//        System.arraycopy(toArr, 0, concatenatedArr, index, toArr.length);
-//        index = index + toArr.length;
-//        concatenatedArr[index] = 0x0;
-//        index = index + 1;
-//        System.arraycopy(messageArr, 0, concatenatedArr, index, messageArr.length);
-
         byte[] concatenatedArr = smc.serialize();
 
         short x = (short) concatenatedArr.length;
@@ -158,6 +142,22 @@ public class FXClientConnection implements ClientConnection {
         try {
             if (this.socket != null)
                 this.socket.close();
+        } catch (IOException e) {
+            LOGGER.error("ERR: ", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendFriendRequest(SendFriendRequestCommand sfc) {
+        byte[] concatenatedArr = sfc.serialize();
+
+        short x = (short) concatenatedArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(concatenatedArr);
         } catch (IOException e) {
             LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);

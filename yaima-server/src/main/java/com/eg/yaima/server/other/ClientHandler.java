@@ -1,8 +1,7 @@
 package com.eg.yaima.server.other;
 
-import com.eg.yaima.common.Constant;
-import com.eg.yaima.common.SendMessageCommand;
-import com.eg.yaima.common.UserStatus;
+import com.eg.yaima.common.*;
+import com.eg.yaima.server.entity.FriendRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +17,13 @@ public class ClientHandler implements Runnable {
 
     private final Socket socket;
     private final YaimaServer yaimaServer;
+    private final CommandDeserializer commandDeserializer;
     private String username;
 
-    public ClientHandler(Socket socket, YaimaServer yaimaServer) {
+    public ClientHandler(Socket socket, YaimaServer yaimaServer, CommandDeserializer commandDeserializer) {
         this.socket = socket;
         this.yaimaServer = yaimaServer;
+        this.commandDeserializer = commandDeserializer;
     }
 
     @Override
@@ -55,6 +56,12 @@ public class ClientHandler implements Runnable {
                 UserStatus userStatus = yaimaServer.getUserStatus(s);
                 sendFriendSTT(s, userStatus);
             }
+
+            //send waiting requests begin
+            List<FriendRequest> friendRequestList = yaimaServer.getFriendRequestsOfUser(username);
+            for (FriendRequest fr : friendRequestList)
+                sendFriendRequestCommand(new SendFriendRequestCommand(fr.getFrom().getUsername(), fr.getTo().getUsername()));
+            //send waiting requests end
 
             yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.ONLINE);
 
@@ -99,6 +106,10 @@ public class ClientHandler implements Runnable {
                     String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
 
                     yaimaServer.redirectChat(new SendMessageCommand(from, to, msg));
+                } else if (packetType.equals("SFR")) {
+
+                    SendFriendRequestCommand sfc = commandDeserializer.deserializeSendFriendRequestCommand(tempArr);
+                    yaimaServer.redirectFriendRequest(sfc);
                 }
 
             } catch (IOException | BufferUnderflowException e) { //TODO: may need to handle BufferUnderflowException somewhat better
@@ -151,4 +162,19 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    public void sendFriendRequestCommand(SendFriendRequestCommand sendFriendRequestCommand) {
+
+        byte[] concatenatedArr = sendFriendRequestCommand.serialize();
+
+        short x = (short) concatenatedArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(concatenatedArr);
+        } catch (IOException e) {
+            LOGGER.error("ERR:", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

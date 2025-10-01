@@ -13,4 +13,6 @@ public interface ClientConnection extends Runnable {
     String getUsername();
 
     void stop();
+
+    void sendFriendRequest(SendFriendRequestCommand sfc);
 }

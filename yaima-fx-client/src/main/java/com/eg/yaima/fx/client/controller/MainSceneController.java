@@ -1,17 +1,12 @@
 package com.eg.yaima.fx.client.controller;
 
 import com.eg.yaima.client.Friend;
-import com.eg.yaima.common.ClientConnection;
-import com.eg.yaima.common.SendMessageCommand;
-import com.eg.yaima.common.UIHandler;
-import com.eg.yaima.common.UserStatus;
+import com.eg.yaima.common.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.util.Duration;
@@ -22,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 public class MainSceneController implements UIHandler {
+
+
 
     private ClientConnection clientConnection;
     private String activeChat;
@@ -34,6 +31,12 @@ public class MainSceneController implements UIHandler {
     private TextArea chatTextArea;
     @FXML
     private TextArea sendTextArea;
+    @FXML
+    private ComboBox<String> usernameComboBox;
+    @FXML
+    private Button sendFriendRequestButton;
+    @FXML
+    private ListView<HBox>  waitingRequestsListView;
 
     @FXML
     public void initialize() {
@@ -53,6 +56,21 @@ public class MainSceneController implements UIHandler {
                 sendTextArea.setText("");
             }
         });
+    }
+
+    @FXML
+    public void onSendFriendRequest(ActionEvent actionEvent) {
+        String friendRequestUsername = usernameComboBox.getValue();
+        SendFriendRequestCommand sfc = new SendFriendRequestCommand(clientConnection.getUsername(), friendRequestUsername);
+        clientConnection.sendFriendRequest(sfc);
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Friend Request Sent");
+        alert.setHeaderText(null);
+        alert.setContentText("to: " + friendRequestUsername);
+        alert.showAndWait();
+
+        usernameComboBox.setValue("");
     }
 
     public void setClientConnection(ClientConnection cc) {
@@ -165,5 +183,14 @@ public class MainSceneController implements UIHandler {
             for (String s : chatHistory)
                 chatTextArea.appendText(s + "\n");
         }
+    }
+
+
+    public void updateWaitingFriendRequests(SendFriendRequestCommand sfc) {
+        Label label = new Label(sfc.from);
+        Button yesButton = new Button("Yes");
+        Button noButton = new Button("No");
+        HBox hBox = new HBox(10, label, yesButton, noButton);
+        waitingRequestsListView.getItems().add(hBox);
     }
 }

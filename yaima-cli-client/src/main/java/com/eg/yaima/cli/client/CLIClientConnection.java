@@ -173,4 +173,9 @@ public class CLIClientConnection implements ClientConnection {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public void sendFriendRequest(SendFriendRequestCommand sfc) {
+        throw new UnsupportedOperationException("yok oyle bisi");
+    }
 }
