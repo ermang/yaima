@@ -13,15 +13,20 @@
         <Insets top="10" right="10" bottom="10" left="10"/>
     </padding>
 
-    <TextArea fx:id="chatTextArea" text="hi" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+    <VBox spacing="10"  alignment="TOP_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="0">
+        <Label fx:id="chatWithLabel" text="--- Chat With ---" alignment="CENTER" maxWidth="Infinity"/>
+        <TextArea fx:id="chatTextArea" text="hi" editable="false">
+            <VBox.vgrow>ALWAYS</VBox.vgrow>
+        </TextArea>
+    </VBox>
 
     <ListView fx:id="buttonListView" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-    <TextArea fx:id="sendTextArea" text="type your thing here" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <TextArea fx:id="sendTextArea" text="type your thing here" GridPane.rowIndex="1" GridPane.columnIndex="0" />
 
 <!--    Vbox holds incoming friend requests and sendFriendRequest-->
     <VBox spacing="10" alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="1">
-        <Label text="waiting friend requests"/>
+        <Label text="--- waiting friend requests ---"/>
         <ListView fx:id="waitingRequestsListView"/>
         <HBox spacing="5">
 

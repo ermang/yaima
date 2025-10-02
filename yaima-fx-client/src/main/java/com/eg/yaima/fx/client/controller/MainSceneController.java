@@ -28,6 +28,8 @@ public class MainSceneController implements UIHandler {
     @FXML
     private ListView<HBox> buttonListView;
     @FXML
+    private Label chatWithLabel;
+    @FXML
     private TextArea chatTextArea;
     @FXML
     private TextArea sendTextArea;
@@ -45,7 +47,7 @@ public class MainSceneController implements UIHandler {
 
         sendTextArea.setOnKeyPressed(event -> {
             if (activeChat != null && event.getCode() == KeyCode.ENTER) {
-                System.out.println("Enter key pressed!");
+
                 event.consume(); // optional: prevent newline from being inserted
 
                 SendMessageCommand smc = new SendMessageCommand(clientConnection.getUsername(), activeChat, sendTextArea.getText());
@@ -107,6 +109,7 @@ public class MainSceneController implements UIHandler {
 
             friendButton.setOnAction(event -> {
                 activeChat = f.username;
+                chatWithLabel.setText("--- Chat With " + activeChat + " ---");
                 //
                 HBox hbox = (HBox)friendButton.getParent();
                 if (hbox.getChildren().size() == 3) {

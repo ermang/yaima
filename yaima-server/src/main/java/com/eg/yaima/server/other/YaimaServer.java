@@ -29,7 +29,7 @@ public class YaimaServer {
 
     private final int port;
     private final YaimaServerHelper yaimaServerHelper;
-    private final Map<String, ClientHandler> onlineUsers;
+    private final Map<String, ClientHandler> onlineUsers; //TODO: convert to thread-safe version
     private final ConnectionAcceptor connectionAcceptor;
 
     private final AppUserRepo appUserRepo;
