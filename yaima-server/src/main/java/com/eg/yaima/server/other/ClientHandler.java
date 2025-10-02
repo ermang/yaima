@@ -76,7 +76,6 @@ public class ClientHandler implements Runnable {
             try {
                 byte[] msgLenArr = socket.getInputStream().readNBytes(2);
 
-
                 int msgLen = ByteBuffer.wrap(msgLenArr).getShort();
 
                 tempArr = socket.getInputStream().readNBytes(msgLen);
@@ -84,28 +83,8 @@ public class ClientHandler implements Runnable {
                 String packetType = new String(tempArr, 0, 3, Constant.CHARSET);
 
                 if (packetType.equals("SMS")) {
-                    int fromIndex = -1;
-                    int toIndex = -1;
-
-                    for (int i = 0; i < tempArr.length; i++) {
-                        if (tempArr[i] == 0) {
-                            fromIndex = i;
-                            break;
-                        }
-                    }
-
-                    for (int i = fromIndex+1; i < tempArr.length; i++) {
-                        if (tempArr[i] == 0) {
-                            toIndex = i;
-                            break;
-                        }
-                    }
-
-                    String from = new String(tempArr, 3, fromIndex - 3, Constant.CHARSET);
-                    String to = new String(tempArr, fromIndex+1, toIndex-fromIndex-1, Constant.CHARSET);
-                    String msg = new String(tempArr, toIndex+1, tempArr.length - toIndex -1, Constant.CHARSET);
-
-                    yaimaServer.redirectChat(new SendMessageCommand(from, to, msg));
+                SendMessageCommand smc = commandDeserializer.deserialize(tempArr);
+                    yaimaServer.redirectChat(smc);
                 } else if (packetType.equals("SFR")) {
                     SendFriendRequestCommand sfc = commandDeserializer.deserializeSendFriendRequestCommand(tempArr);
                     yaimaServer.redirectFriendRequest(sfc);
@@ -118,7 +97,8 @@ public class ClientHandler implements Runnable {
             } catch (IOException | BufferUnderflowException e) { //TODO: may need to handle BufferUnderflowException somewhat better
                 //throw new RuntimeException(e);
                 //TODO: get online friends of this user
-                //send them STT message with OFFLINE status
+                LOGGER.debug("Client with ip:{} port:{} username:{} has a problem", remoteIp, remotePort, username);
+
                LOGGER.error("ERR:", e);
                yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.OFFLINE);
                yaimaServer.removeFromOnlineUsers(username);

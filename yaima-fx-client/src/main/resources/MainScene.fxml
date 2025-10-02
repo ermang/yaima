@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import java.lang.String?>
+<?import javafx.geometry.Insets?>
 <GridPane xmlns="http://javafx.com/javafx/21"
           xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="com.eg.yaima.fx.client.controller.MainSceneController"
           hgap="10" vgap="10" alignment="center">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
 
     <TextArea fx:id="chatTextArea" text="hi" editable="false" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
 
@@ -19,7 +19,9 @@
 
     <TextArea fx:id="sendTextArea" text="type your thing here" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
-    <VBox spacing="10" GridPane.rowIndex="1" GridPane.columnIndex="1">
+<!--    Vbox holds incoming friend requests and sendFriendRequest-->
+    <VBox spacing="10" alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="1">
+        <Label text="waiting friend requests"/>
         <ListView fx:id="waitingRequestsListView"/>
         <HBox spacing="5">
 

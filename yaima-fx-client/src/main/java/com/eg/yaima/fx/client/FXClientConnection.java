@@ -4,10 +4,12 @@ import com.eg.yaima.client.Friend;
 import com.eg.yaima.common.*;
 import com.eg.yaima.fx.client.controller.MainSceneController;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
@@ -71,7 +73,20 @@ public class FXClientConnection implements ClientConnection {
                 }
             }
 
-        } catch (IOException e) {
+        } catch(ConnectException e) {
+            LOGGER.error("ERR:", e);
+            Platform.runLater(() -> {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Network Error");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Can not connect to server, closing app");
+                        alert.showAndWait();
+                        Platform.exit();
+                    }
+                    );
+
+        }
+        catch (IOException e) {
             LOGGER.error("ERR:", e);
             while (!Platform.isFxApplicationThread()) { // wait until javafx is running
                 try {
