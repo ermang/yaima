@@ -60,4 +60,11 @@ public class LoginSceneController {
         stage.setScene(newScene);
         stage.show();
     }
+
+    @FXML
+    private void onSignUpClick(ActionEvent actionEvent) {
+    }
+
+
+
 }

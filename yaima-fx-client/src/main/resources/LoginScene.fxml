@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+
 <GridPane xmlns="http://javafx.com/javafx/21"
           xmlns:fx="http://javafx.com/fxml/1"
           fx:controller="com.eg.yaima.fx.client.controller.LoginSceneController"
@@ -25,7 +25,14 @@
     <Button text="Login"
             fx:id="loginButton"
             GridPane.rowIndex="2"
-            GridPane.columnIndex="1"
+            GridPane.columnIndex="0"
             onAction="#onLoginClick"/>
+
+    <!-- Sign Up Button -->
+    <Button text="Sign Up"
+            fx:id="signUpButton"
+            GridPane.rowIndex="2"
+            GridPane.columnIndex="1"
+            onAction="#onSignUpClick"/>
 
 </GridPane>
