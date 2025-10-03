@@ -18,8 +18,6 @@ import java.util.Map;
 
 public class MainSceneController implements UIHandler {
 
-
-
     private ClientConnection clientConnection;
     private String activeChat;
     private Map<String, List<String>> friendChatHistory;
@@ -217,6 +215,7 @@ public class MainSceneController implements UIHandler {
                 }
             }
         });
+
         HBox hBox = new HBox(10, label, yesButton, noButton);
         waitingRequestsListView.getItems().add(hBox);
     }
