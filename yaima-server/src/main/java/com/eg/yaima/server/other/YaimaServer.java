@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 @Component
@@ -43,7 +44,7 @@ public class YaimaServer {
                        FriendRequestRepo friendRequestRepo) {
         this.port = port;
         this.yaimaServerHelper = yaimaServerHelper;
-        onlineUsers = new HashMap<>();
+        onlineUsers = new ConcurrentHashMap<>();
         this.connectionAcceptor = new ConnectionAcceptor(port, this);
 
         this.appUserRepo = appUserRepo;
@@ -65,8 +66,10 @@ public class YaimaServer {
     public void redirectChat(SendMessageCommand sendMessageCommand) {
         ClientHandler ch = onlineUsers.get(sendMessageCommand.to);
 
-        if (ch == null)
+        if (ch == null) {
+            LOGGER.debug("user:{} is not online anymore", sendMessageCommand.to);
             throw new RuntimeException("yok oyle bisi");
+        }
 
         ch.sendMessage(sendMessageCommand);
     }

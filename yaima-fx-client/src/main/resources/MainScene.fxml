@@ -15,8 +15,8 @@
     </padding>
 
     <VBox spacing="10"  alignment="TOP_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="0">
-        <Label fx:id="chatWithLabel" text="--- Chat With ---" alignment="CENTER" maxWidth="Infinity"/>
-        <TextArea fx:id="chatTextArea" text="hi" editable="false">
+        <Label fx:id="chatWithLabel" text="--- chat With ---" alignment="CENTER" maxWidth="Infinity"/>
+        <TextArea fx:id="chatTextArea" text="hi, click on a friend and chat" editable="false">
             <VBox.vgrow>ALWAYS</VBox.vgrow>
         </TextArea>
     </VBox>

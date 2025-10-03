@@ -103,6 +103,9 @@ public class ClientHandler implements Runnable {
                yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.OFFLINE);
                yaimaServer.removeFromOnlineUsers(username);
                break;
+            } catch (Exception e) {
+                //TODO: buraya gelmemeli handle et
+                LOGGER.error("ERR", e);
             }
         }
 

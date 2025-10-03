@@ -107,7 +107,7 @@ public class MainSceneController implements UIHandler {
 
             friendButton.setOnAction(event -> {
                 activeChat = f.username;
-                chatWithLabel.setText("--- Chat With " + activeChat + " ---");
+                chatWithLabel.setText("--- chat with " + activeChat + " ---");
                 //
                 HBox hbox = (HBox)friendButton.getParent();
                 if (hbox.getChildren().size() == 3) {
