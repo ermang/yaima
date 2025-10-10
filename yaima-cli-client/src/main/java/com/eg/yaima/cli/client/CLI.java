@@ -82,4 +82,8 @@ public class CLI implements UIHandler {
         window.close();
     }
 
+    @Override
+    public void processLoginSuccess() {
+
+    }
 }

@@ -105,7 +105,7 @@ public class YaimaServer {
         AppUser to = appUserRepo.findByUsername(sendFriendRequestCommand.to);
 
         if (to == null) {
-            SendServerResponseCommand ssr = new SendServerResponseCommand("no such user " + sendFriendRequestCommand.to);
+            SendServerResponseCommand ssr = new SendServerResponseCommand("no such user " + sendFriendRequestCommand.to, false);
             ClientHandler ch = onlineUsers.get(sendFriendRequestCommand.from);
             ch.sendServerResponseCommand(ssr);
             return;
@@ -151,5 +151,24 @@ public class YaimaServer {
         } else
             LOGGER.debug("What to do when friend request rejected ???");
 
+    }
+
+    public boolean tryLogin(LoginRequestCommand lrc, ClientHandler ch) {
+        AppUser appUser = appUserRepo.findByUsername(lrc.username);
+
+        if (appUser == null) {
+            SendServerResponseCommand ssr = new SendServerResponseCommand("no such user " + lrc.username, false);
+            ch.sendServerResponseCommand(ssr);
+            return false;
+        }
+
+        if (lrc.username.equals(appUser.getUsername()) && lrc.password.equals(appUser.getPassword())) {
+            addOnlineUser(lrc.username, ch);
+            return true;
+        } else {
+            SendServerResponseCommand ssr = new SendServerResponseCommand("no such user or password no match " + lrc.username, false);
+            ch.sendServerResponseCommand(ssr);
+            return false;
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.eg.yaima.fx.client.controller;
 
 import com.eg.yaima.common.ClientConnection;
+import com.eg.yaima.common.LoginRequestCommand;
+import com.eg.yaima.common.UIHandler;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,11 +17,15 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class LoginSceneController {
+public class LoginSceneController implements UIHandler {
 
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     private ClientConnection clientConnection;
+
+    public TextField getUsernameField() {
+        return usernameField;
+    }
 
     // Optional: initialize method called after FXML loaded
     @FXML
@@ -34,31 +40,35 @@ public class LoginSceneController {
 
     @FXML
     private void onLoginClick(ActionEvent actionEvent) throws IOException {
+
+        clientConnection.setLoginSceneController(this);
+
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Login Info");
-        alert.setHeaderText(null);
-        alert.setContentText("Username: " + username + "\nPassword: " + password);
-        alert.showAndWait();
+//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//        alert.setTitle("Login Info");
+//        alert.setHeaderText(null);
+//        alert.setContentText("Username: " + username + "\nPassword: " + password);
+//        alert.showAndWait();
 
-        clientConnection.login(username);
+        LoginRequestCommand lrc = new LoginRequestCommand(username, password);
+        clientConnection.login(lrc);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainScene.fxml"));
-        Parent root = loader.load();
-
-        MainSceneController mainSceneController = loader.getController();
-        mainSceneController.setClientConnection(clientConnection);
-        clientConnection.setUIHandler(mainSceneController);
-
-        Scene newScene = new Scene(root);
-
-        // Get the current stage (window)
-        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
-
-        stage.setScene(newScene);
-        stage.show();
+//        FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainScene.fxml"));
+//        Parent root = loader.load();
+//
+//        MainSceneController mainSceneController = loader.getController();
+//        mainSceneController.setClientConnection(clientConnection);
+//        clientConnection.setUIHandler(mainSceneController);
+//
+//        Scene newScene = new Scene(root);
+//
+//        // Get the current stage (window)
+//        Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+//
+//        stage.setScene(newScene);
+//        stage.show();
     }
 
     @FXML
@@ -66,5 +76,8 @@ public class LoginSceneController {
     }
 
 
+    @Override
+    public void processLoginSuccess() {
 
+    }
 }

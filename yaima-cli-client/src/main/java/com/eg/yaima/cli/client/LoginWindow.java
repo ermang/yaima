@@ -49,8 +49,8 @@ public class LoginWindow {
         Button loginButton = new Button("sign in", () -> {
             System.out.println("button clicked");
             String username = usernameTextBox.getText();
-            boolean loginResult = CLIClientConnection.login(username);
-            if (loginResult)
+            //boolean loginResult = CLIClientConnection.login(username);
+            //if (loginResult)
                 cli.setNextWindow(Constant.WINDOW.MAIN);
             window.close();
         });

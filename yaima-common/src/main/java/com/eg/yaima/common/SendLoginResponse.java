@@ -1,17 +1,17 @@
 package com.eg.yaima.common;
 
-public class SendServerResponseCommand {
+public class SendLoginResponse {
 
     public final String message;
     public final boolean operationSuccess;
 
-    public SendServerResponseCommand(String message, boolean operationSuccess) {
+    public SendLoginResponse(String message, boolean operationSuccess) {
         this.message = message;
         this.operationSuccess = operationSuccess;
     }
 
     public byte[] serialize() {
-        byte[] packetTypeArr = "SSR".getBytes(Constant.CHARSET);
+        byte[] packetTypeArr = "SLR".getBytes(Constant.CHARSET);
         byte operationSuccessByte =  operationSuccess ? "Y".getBytes(Constant.CHARSET)[0] : "N".getBytes(Constant.CHARSET)[0] ;
         byte[] messageArr = message.getBytes(Constant.CHARSET);
 

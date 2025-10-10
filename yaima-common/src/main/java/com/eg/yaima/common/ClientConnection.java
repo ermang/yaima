@@ -4,7 +4,7 @@ public interface ClientConnection extends Runnable {
     @Override
     void run();
 
-    boolean login(String username);
+    boolean login(LoginRequestCommand username);
 
     void setUIHandler(UIHandler uiHandler);
 
@@ -18,4 +18,6 @@ public interface ClientConnection extends Runnable {
 
 
     void senfFriendAnswer(SendFriendAnswerCommand sfa);
+
+    void setLoginSceneController(UIHandler uiHandler);
 }

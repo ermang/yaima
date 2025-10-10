@@ -219,4 +219,9 @@ public class MainSceneController implements UIHandler {
         HBox hBox = new HBox(10, label, yesButton, noButton);
         waitingRequestsListView.getItems().add(hBox);
     }
+
+    @Override
+    public void processLoginSuccess() {
+
+    }
 }

@@ -34,36 +34,60 @@ public class ClientHandler implements Runnable {
         LOGGER.debug("Client with ip:{} port:{} connected", remoteIp, remotePort);
 
         byte[] tempArr = null;
+        boolean loggedIn = false;
 
         try {
-            tempArr = socket.getInputStream().readNBytes(Constant.MAX_USERNAME_LEN);
 
+            while(!loggedIn) {
+                byte[] msgLenArr = socket.getInputStream().readNBytes(2);
+                int msgLen = ByteBuffer.wrap(msgLenArr).getShort();
+                tempArr = socket.getInputStream().readNBytes(msgLen);
 
-            String username = new String(tempArr, Constant.CHARSET).trim();
-            System.out.println(username);
+                String packetType = new String(tempArr, 0, 3, Constant.CHARSET);
 
-            yaimaServer.addOnlineUser(username, this);
-            this.username = username;
+                if (packetType.equals("LRC")) {
+                    LoginRequestCommand lrc = commandDeserializer.deserializeLoginRequestCommand(tempArr);
+                    loggedIn = yaimaServer.tryLogin(lrc, this);
 
-            //TODO: do the login
-            //assume login is successful
-            LOGGER.debug("Client with ip:{} port:{} username:{} connected", remoteIp, remotePort, username);
+                    if (loggedIn) {
+                        this.username = lrc.username;
+                        LOGGER.debug("Client with ip:{} port:{} username:{} logged in successfully", remoteIp, remotePort, username);
 
-            List<String> friendsOfUser = yaimaServer.getFriendsOfUser(username);
-            LOGGER.debug("Client with ip:{} port:{} username:{} friends:{}", remoteIp, remotePort, username, friendsOfUser);
-            //TODO: check their statuses (online/offline) and send this data to logged in user
-            for (String s : friendsOfUser) {
-                UserStatus userStatus = yaimaServer.getUserStatus(s);
-                sendFriendSTT(s, userStatus);
+                        SendLoginResponse slr = new SendLoginResponse("log in success", true);
+                        byte[] temp = slr.serialize();
+
+                        short x = (short) temp.length;
+                        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+                        try {
+                            socket.getOutputStream().write(bytes);
+                            socket.getOutputStream().write(temp);
+                        } catch (IOException e) {
+                            LOGGER.error("ERR:", e);
+                            throw new RuntimeException(e);
+                        }
+
+                        List<String> friendsOfUser = yaimaServer.getFriendsOfUser(username);
+                        LOGGER.debug("Client with ip:{} port:{} username:{} friends:{}", remoteIp, remotePort, username, friendsOfUser);
+                        //TODO: check their statuses (online/offline) and send this data to logged in user
+                        for (String s : friendsOfUser) {
+                            UserStatus userStatus = yaimaServer.getUserStatus(s);
+                            sendFriendSTT(s, userStatus);
+                        }
+
+                        //send waiting requests begin
+                        List<FriendRequest> friendRequestList = yaimaServer.getFriendRequestsOfUser(username);
+                        for (FriendRequest fr : friendRequestList)
+                            sendFriendRequestCommand(new SendFriendRequestCommand(fr.getFrom().getUsername(), fr.getTo().getUsername()));
+                        //send waiting requests end
+
+                        yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.ONLINE);
+                    }
+                } else {
+                    LOGGER.error("olmaz oyle sey");
+                    //throw new RuntimeException("olmaz oyle sey");
+                }
             }
-
-            //send waiting requests begin
-            List<FriendRequest> friendRequestList = yaimaServer.getFriendRequestsOfUser(username);
-            for (FriendRequest fr : friendRequestList)
-                sendFriendRequestCommand(new SendFriendRequestCommand(fr.getFrom().getUsername(), fr.getTo().getUsername()));
-            //send waiting requests end
-
-            yaimaServer.notifyFriendsOfStatusChange(username, UserStatus.ONLINE);
 
         } catch (IOException e) {
             LOGGER.error("ERR:", e);

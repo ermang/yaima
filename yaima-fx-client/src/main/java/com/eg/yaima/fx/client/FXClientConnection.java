@@ -2,9 +2,15 @@ package com.eg.yaima.fx.client;
 
 import com.eg.yaima.client.Friend;
 import com.eg.yaima.common.*;
+import com.eg.yaima.fx.client.controller.LoginSceneController;
 import com.eg.yaima.fx.client.controller.MainSceneController;
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +27,7 @@ public class FXClientConnection implements ClientConnection {
     private int port;
     private Socket socket;
     private MainSceneController uiHandler;
+    private LoginSceneController loginSceneController;
     private String username;
 
     public FXClientConnection(String ip, int port) {
@@ -41,9 +48,7 @@ public class FXClientConnection implements ClientConnection {
             while(true) {
 
                 msgLenArr = socket.getInputStream().readNBytes(2);
-
                 int result = ByteBuffer.wrap(msgLenArr).getShort();
-
                 tempArr = socket.getInputStream().readNBytes(result);
 
                 String packetType = new String(tempArr, 0, 3, Constant.CHARSET);
@@ -81,6 +86,35 @@ public class FXClientConnection implements ClientConnection {
                         alert.setContentText(ssr.message);
                         alert.showAndWait();
                     });
+                } else if (packetType.equals("SLR")) {
+                    SendLoginResponse slr = commandDeserializer.deserializeSendLoginResponse(tempArr);
+
+                    if (slr.operationSuccess) {
+                        Platform.runLater(() -> {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/MainScene.fxml"));
+                            Parent root = null;
+                            try {
+                                root = loader.load();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            MainSceneController mainSceneController = loader.getController();
+                            mainSceneController.setClientConnection(this);
+                            this.setUIHandler(mainSceneController);
+
+                            Scene newScene = new Scene(root);
+
+                            // Get the current stage (window)
+                            //Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
+                            Stage stage = (Stage) loginSceneController.getUsernameField().getScene().getWindow();
+
+                            stage.setScene(newScene);
+                            stage.show();
+                        });
+                    }
+
+                    //uiHandler.processLoginSuccess();
                 }
             }
 
@@ -116,19 +150,27 @@ public class FXClientConnection implements ClientConnection {
     }
 
     @Override
-    public boolean login(String username) {
+    public boolean login(LoginRequestCommand lrc) {
 
-        String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
+//        String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
+//
+//        byte[] tempArr = usernameSpacePadded.getBytes(Constant.CHARSET);
 
-        byte[] tempArr = usernameSpacePadded.getBytes(Constant.CHARSET);
+        byte[] tempArr = lrc.serialize();
+
+        short x = (short) tempArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+
         try {
+            socket.getOutputStream().write(bytes);
             socket.getOutputStream().write(tempArr);
         } catch (IOException e) {
             LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);
         }
 
-        this.username = username;
+        this.username = lrc.username;
 
         return true;
     }
@@ -145,7 +187,6 @@ public class FXClientConnection implements ClientConnection {
     public void sendMessage(SendMessageCommand smc) {
 
         byte[] concatenatedArr = smc.serialize();
-
         short x = (short) concatenatedArr.length;
         byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
 
@@ -204,5 +245,20 @@ public class FXClientConnection implements ClientConnection {
             LOGGER.error("ERR: ", e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setLoginSceneController(UIHandler uiHandler) {
+        if (uiHandler instanceof LoginSceneController)
+            this.loginSceneController = (LoginSceneController) uiHandler;
+        else
+            throw new UnsupportedOperationException("olmaz oyle sey");
+    }
+
+    public void setLoginSceneController(LoginSceneController lsc) {
+        if (lsc instanceof LoginSceneController)
+            this.loginSceneController = (LoginSceneController) lsc;
+        else
+            throw new UnsupportedOperationException("olmaz oyle sey");
     }
 }

@@ -97,19 +97,19 @@ public class CLIClientConnection implements ClientConnection {
     }
 
     @Override
-    public boolean login(String username) {
+    public boolean login(LoginRequestCommand username) {
 
-        String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
-
-        byte[] tempArr = usernameSpacePadded.getBytes(Constant.CHARSET);
-        try {
-            socket.getOutputStream().write(tempArr);
-        } catch (IOException e) {
-            LOGGER.error("ERR: ", e);
-            throw new RuntimeException(e);
-        }
-
-        this.username = username;
+//        String usernameSpacePadded = username.length() < Constant.MAX_USERNAME_LEN ? username + " ".repeat(Constant.MAX_USERNAME_LEN - username.length()) : username;
+//
+//        byte[] tempArr = usernameSpacePadded.getBytes(Constant.CHARSET);
+//        try {
+//            socket.getOutputStream().write(tempArr);
+//        } catch (IOException e) {
+//            LOGGER.error("ERR: ", e);
+//            throw new RuntimeException(e);
+//        }
+//
+//        this.username = username;
 
         return true;
     }
@@ -177,5 +177,10 @@ public class CLIClientConnection implements ClientConnection {
     @Override
     public void sendFriendRequest(SendFriendRequestCommand sfc) {
         throw new UnsupportedOperationException("yok oyle bisi");
+    }
+
+    @Override
+    public void senfFriendAnswer(SendFriendAnswerCommand sfa) {
+
     }
 }
