@@ -64,11 +64,11 @@ public class MainSceneController implements UIHandler {
         SendFriendRequestCommand sfc = new SendFriendRequestCommand(clientConnection.getUsername(), friendRequestUsername);
         clientConnection.sendFriendRequest(sfc);
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Friend Request Sent");
-        alert.setHeaderText(null);
-        alert.setContentText("to: " + friendRequestUsername);
-        alert.showAndWait();
+//        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//        alert.setTitle("Friend Request Sent");
+//        alert.setHeaderText(null);
+//        alert.setContentText("to: " + friendRequestUsername);
+//        alert.showAndWait();
 
         usernameComboBox.setValue("");
     }

@@ -81,4 +81,12 @@ public class CommandDeserializer {
 
         return sfa;
     }
+
+    public SendServerResponseCommand deserializeSendServerResponseCOmmand(byte[] tempArr) {
+        String message = new String(tempArr, 3, tempArr.length-1-2, Constant.CHARSET);
+
+        SendServerResponseCommand ssr = new SendServerResponseCommand(message);
+
+        return ssr;
+    }
 }

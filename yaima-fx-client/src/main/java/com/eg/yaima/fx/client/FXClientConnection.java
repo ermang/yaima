@@ -70,6 +70,17 @@ public class FXClientConnection implements ClientConnection {
                     int x = 5;
 
                    Platform.runLater(() -> uiHandler.updateWaitingFriendRequests(sfc));
+                } else if (packetType.equals("SSR")) {
+                    SendServerResponseCommand ssr = commandDeserializer.deserializeSendServerResponseCOmmand(tempArr);
+
+                    Platform.runLater(() -> {
+
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("server says");
+                        alert.setHeaderText(null);
+                        alert.setContentText(ssr.message);
+                        alert.showAndWait();
+                    });
                 }
             }
 

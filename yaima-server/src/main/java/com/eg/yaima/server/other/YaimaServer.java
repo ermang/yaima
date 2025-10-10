@@ -1,9 +1,6 @@
 package com.eg.yaima.server.other;
 
-import com.eg.yaima.common.SendFriendAnswerCommand;
-import com.eg.yaima.common.SendFriendRequestCommand;
-import com.eg.yaima.common.SendMessageCommand;
-import com.eg.yaima.common.UserStatus;
+import com.eg.yaima.common.*;
 import com.eg.yaima.server.entity.AppFriend;
 import com.eg.yaima.server.entity.AppUser;
 import com.eg.yaima.server.entity.FriendRequest;
@@ -106,6 +103,13 @@ public class YaimaServer {
     public void redirectFriendRequest(SendFriendRequestCommand sendFriendRequestCommand) {
         AppUser from = appUserRepo.findByUsername(sendFriendRequestCommand.from);
         AppUser to = appUserRepo.findByUsername(sendFriendRequestCommand.to);
+
+        if (to == null) {
+            SendServerResponseCommand ssr = new SendServerResponseCommand("no such user " + sendFriendRequestCommand.to);
+            ClientHandler ch = onlineUsers.get(sendFriendRequestCommand.from);
+            ch.sendServerResponseCommand(ssr);
+            return;
+        }
 
         FriendRequest fr = new FriendRequest();
         fr.setFrom(from);

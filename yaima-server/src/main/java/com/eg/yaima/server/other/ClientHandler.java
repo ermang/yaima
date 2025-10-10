@@ -163,4 +163,20 @@ public class ClientHandler implements Runnable {
             throw new RuntimeException(e);
         }
     }
+
+    public void sendServerResponseCommand(SendServerResponseCommand ssr) {
+
+        byte[] concatenatedArr = ssr.serialize();
+
+        short x = (short) concatenatedArr.length;
+        byte[] bytes = ByteBuffer.allocate(2).putShort(x).array();
+
+        try {
+            socket.getOutputStream().write(bytes);
+            socket.getOutputStream().write(concatenatedArr);
+        } catch (IOException e) {
+            LOGGER.error("ERR:", e);
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -17,7 +17,7 @@
 
     <VBox spacing="10"  alignment="TOP_LEFT" GridPane.rowIndex="0" GridPane.columnIndex="0">
         <Label fx:id="chatWithLabel" text="--- chat With ---" alignment="CENTER" maxWidth="Infinity"/>
-        <TextArea fx:id="chatTextArea" text="hi, click on a friend and chat" editable="false">
+        <TextArea fx:id="chatTextArea" text="hi, click on a friend and chat" editable="false"  wrapText="true">
             <VBox.vgrow>ALWAYS</VBox.vgrow>
         </TextArea>
     </VBox>
@@ -28,7 +28,7 @@
         <ListView fx:id="buttonListView" />
     </VBox>
 
-    <TextArea fx:id="sendTextArea" text="type your thing here" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+    <TextArea fx:id="sendTextArea" text="type your thing here"  wrapText="true" GridPane.rowIndex="1" GridPane.columnIndex="0" />
 
     <!--    Vbox holds incoming friend requests and sendFriendRequest-->
     <VBox spacing="10" alignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="1">
